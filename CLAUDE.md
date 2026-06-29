@@ -67,6 +67,7 @@ Whenever recommending a new file, an architecture change, or a feature, explain:
 - Always evaluate whether the **repository architecture itself** should change before recommending new implementation.
 - Challenge Michael's assumptions when appropriate.
 - When multiple valid approaches exist, explain the tradeoffs and recommend one.
+- When deciding what a capability becomes (agent, workflow, memory system, service, or client deployment), also decide **whether it needs a Dockerized runtime boundary** — see `01-rules/runtime-environment.md`. Do not containerize documentation-only work; consider Docker early for anything executable.
 
 ---
 
