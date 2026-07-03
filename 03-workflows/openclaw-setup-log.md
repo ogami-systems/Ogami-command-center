@@ -99,3 +99,15 @@ Everything else for `ogami-operator` — including `git commit` and `git push`, 
 **Undo, if needed:**
 - Agent: `openclaw agents delete ogami-operator --force`
 - Approval policy: `rm ~/.openclaw/exec-approvals.json` — **note:** since no prior policy file existed, this restores OpenClaw's original wide-open baseline (`security=full, ask=off`) for *every* agent, not just a removal of the `ogami-operator` entry. To keep the locked-down default while removing only `ogami-operator`, apply a replacement file that keeps `defaults` and omits the `agents.ogami-operator` block, via the same `openclaw approvals set --file` command.
+
+### 2026-07-03 — OpenClaw-supervised gate test (MacBook, dev)
+
+Distinct from the dry-run above, which exercised `build-and-review.js` through Claude Code's native Agent/Workflow tools directly — that path never goes through OpenClaw's exec-approvals at all. This test specifically targeted the remaining untested gate: `ogami-operator` running as an OpenClaw-*supervised* agent (`openclaw agent --agent ogami-operator`), where `exec-approvals.json` actually intercepts its exec calls.
+
+- **Attempted, scoped to stop before any commit** — the first version of this test scripted an explicit `git commit` step (intending only to observe it get blocked); the harness correctly refused to run it, since a scripted commit attempt is indistinguishable from "commit this" and directly conflicts with the standing "do not commit" boundary. Re-scoped to stop after `git add`, no commit instruction at all.
+- **Policy triggered.** The very first step (`git worktree add ...`) was intercepted by OpenClaw's exec-approval system and denied. It never ran.
+- **Failed closed.** This was a one-shot, non-interactive call with no human watching an approval channel. Policy is `ask=on-miss` / `askFallback=deny`: with nobody to answer the ask, it resolved to deny rather than hanging or defaulting to allow — the fail-closed behavior working as designed.
+- **No files, worktrees, or branches were created.** Confirmed via direct filesystem and `git worktree list`/`git branch` inspection after the run, not just the agent's self-report.
+- **Live human approval prompt not yet tested.** This run had no one actively watching an OpenClaw approval channel to answer the ask — that path (a human actually seeing and resolving a live prompt) remains unverified.
+- **Allowlist `argPattern` did not match as intended.** `git worktree add` was meant to be tier-1 (auto-run, no prompt) per the `argPattern` scoped to `status|diff|show|log|add|worktree`. Instead it received the same treatment as an unlisted command. Root cause not yet diagnosed — plausibly whether `argPattern` is matched against the arguments alone or the full command line including `git` itself.
+- **Assessment: the remaining issue is allowlist tuning, not core safety.** The gate's failure mode is over-blocking (denies things intended to be frictionless), never under-blocking (nothing unapproved got through). Deliberately not debugged or widened as part of this entry — allowlist tuning is separate follow-up work, tracked here rather than acted on now.
