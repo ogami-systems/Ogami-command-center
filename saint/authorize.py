@@ -17,6 +17,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 from accounts.registry import ACCOUNT_NAMES, AccountRegistry
 from config import Config
+from logging_setup import setup_logging
 
 REDIRECT_PORT = 8080
 
@@ -35,6 +36,8 @@ def _client_config(client_id: str, client_secret: str) -> dict:
 
 def authorize(account_name: str) -> None:
     config = Config.from_env()
+    setup_logging(config.saint_log_level)  # before any OAuth or Google credential handling
+
     registry = AccountRegistry(config)
     account = registry.get(account_name)
 

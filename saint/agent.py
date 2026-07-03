@@ -23,6 +23,7 @@ import tools
 from accounts.registry import AccountRegistry
 from config import Config
 from db import Database
+from logging_setup import setup_logging
 from redact import redact
 
 STANDARD = "standard"
@@ -219,6 +220,8 @@ if __name__ == "__main__":
     import sys
 
     cfg = Config.from_env()
+    setup_logging(cfg.saint_log_level)  # before any credential-touching client is built
+
     registry = AccountRegistry(cfg)
     db = Database(cfg.saint_db_path)
     client = anthropic.Anthropic(api_key=cfg.anthropic_api_key)
