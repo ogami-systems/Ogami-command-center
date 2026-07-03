@@ -1,0 +1,31 @@
+# --- Secrets: never in Git (01-rules/security-boundaries.md) ---
+.env
+saint/.env
+saint/secrets/*
+!saint/secrets/.gitkeep
+**/*_token.json
+**/token.json
+credentials.json
+
+# --- Runtime state / databases ---
+saint/data/*.db
+saint/data/*.db-journal
+*.db
+*.sqlite3
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.venv_smoketest/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# --- OS ---
+.DS_Store
+
+# --- Editors ---
+.vscode/
+.idea/

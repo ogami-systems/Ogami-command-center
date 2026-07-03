@@ -1,0 +1,8 @@
+services:
+  saint:
+    build: .
+    env_file: .env
+    volumes:
+      - ./secrets:/app/secrets
+      - ./data:/app/data
+    restart: unless-stopped

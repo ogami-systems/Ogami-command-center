@@ -1,0 +1,17 @@
+# Belt-and-suspenders on top of .gitignore: never let these reach an image layer.
+.env
+secrets/
+data/
+*.db
+*.db-journal
+
+.venv/
+.venv_smoketest/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.git
+.gitignore
+README.md
+SETUP.md
