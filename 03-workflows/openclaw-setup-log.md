@@ -84,3 +84,18 @@ Everything else for `ogami-operator` — including `git commit` and `git push`, 
 
 - If `openclaw approvals get --json` after step 3 doesn't match the intended policy, halt before running anything through the new agent and re-diff the applied file against this document.
 - Any allowlist pattern that turns out too broad during dry-run testing (`03-workflows/build-and-review.md`) is tightened here first, then reapplied — never loosened elsewhere to route around it.
+
+## Run log
+
+### 2026-07-03 — MacBook (dev)
+
+- `openclaw agents add ogami-operator --workspace ~/Developer/Ogami --model anthropic/claude-sonnet-4-6 --non-interactive` — **succeeded**. Agent dir: `~/.openclaw/agents/ogami-operator/agent`.
+- Workspace confirmed via `openclaw agents list`: `~/Developer/Ogami` — not `~/Developer`, not `~/ogami-command-center`.
+- `openclaw approvals set --file ~/ogami-command-center/03-workflows/exec-approvals.ogami-operator.json` — **succeeded**. Verified via `openclaw approvals get --json`, not just the command's own output:
+  - **Default policy (any agent other than `ogami-operator`) is now locked down**: `security=deny, ask=always, askFallback=deny` → effective mode `deny`. Before this run, no `exec-approvals.json` existed at all and OpenClaw's baseline was wide open (`security=full, ask=off`); this run closed that gap for every agent, not only `ogami-operator`.
+  - `ogami-operator` resolves to `security=allowlist, ask=on-miss, askFallback=deny` → effective mode `ask`. All 4 allowlist entries confirmed stored with `argPattern` intact (`git` restricted to status/diff/show/log/add/worktree, `rg`, `node --test`, `npm test`/`lint`/`build`). Everything else — including `git commit` and `git push` — falls to a live, fail-closed prompt, exactly as designed in the policy above.
+- **Warning surfaced by `agents add`, pre-existing, not caused by this change:** `plugins.allow is empty; discovered non-bundled plugins may auto-load: brave, codex, groq`. Not remediated as part of this run — flagged here for a future decision on whether to pin `plugins.allow` explicitly.
+
+**Undo, if needed:**
+- Agent: `openclaw agents delete ogami-operator --force`
+- Approval policy: `rm ~/.openclaw/exec-approvals.json` — **note:** since no prior policy file existed, this restores OpenClaw's original wide-open baseline (`security=full, ask=off`) for *every* agent, not just a removal of the `ogami-operator` entry. To keep the locked-down default while removing only `ogami-operator`, apply a replacement file that keeps `defaults` and omits the `agents.ogami-operator` block, via the same `openclaw approvals set --file` command.
