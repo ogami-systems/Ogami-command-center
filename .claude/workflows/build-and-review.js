@@ -36,12 +36,30 @@ const VERDICT_SCHEMA = {
   required: ['clean', 'issues'],
 }
 
+const REVIEW_RUN_SCHEMA = {
+  type: 'object',
+  properties: {
+    exitCode: { type: 'number', description: 'the shell exit code of the command' },
+    output: { type: 'string', description: 'combined stdout and stderr, verbatim' },
+  },
+  required: ['exitCode', 'output'],
+}
+
 phase('Setup')
-const targetRepo = args.targetRepo
-const task = args.task
-const worktreeName = args.worktreeName || 'ogami-operator-run'
+// Defensive: some callers/transports deliver `args` as a JSON-encoded string
+// rather than a parsed object. Handle both rather than failing on a technicality.
+const parsedArgs = typeof args === 'string' ? JSON.parse(args) : args
+if (!parsedArgs || !parsedArgs.targetRepo || !parsedArgs.task) {
+  throw new Error(
+    `build-and-review requires args.targetRepo and args.task. Received: ${JSON.stringify(args)}`
+  )
+}
+const targetRepo = parsedArgs.targetRepo
+const task = parsedArgs.task
+const worktreeName = parsedArgs.worktreeName || 'ogami-operator-run'
 const worktreePath = `${targetRepo}/.ogami-worktrees/${worktreeName}`
 const branch = `ogami/${worktreeName}`
+log(`args received: targetRepo=${targetRepo} task="${task}" worktreeName=${worktreeName}`)
 
 log(`Provisioning worktree at ${worktreePath}`)
 const setup = await agent(
@@ -60,15 +78,27 @@ phase('Adversarial Review')
 let round = 0
 let clean = false
 let lastReview = null
+let toolFailure = false
 
 while (round < MAX_REVIEW_ROUNDS && !clean) {
   round++
   log(`Codex review round ${round}/${MAX_REVIEW_ROUNDS}`)
 
-  lastReview = await agent(
-    `Run this exact command and return its full stdout verbatim, nothing else: codex exec review --uncommitted --sandbox read-only -C "${worktreePath}"`,
-    { phase: 'Adversarial Review', label: `codex-review-round-${round}` }
+  // codex exec review has no -C/--cd flag (only the parent `codex exec` does) —
+  // it reviews whatever git repo the current working directory is inside of.
+  const reviewRun = await agent(
+    `Run this exact command: cd "${worktreePath}" && codex exec review --uncommitted\n\nReport its exit code and its full combined stdout+stderr output, verbatim. Do not summarize or interpret it.`,
+    { phase: 'Adversarial Review', label: `codex-review-round-${round}`, schema: REVIEW_RUN_SCHEMA }
   )
+  lastReview = reviewRun ? reviewRun.output : null
+
+  if (!reviewRun || reviewRun.exitCode !== 0) {
+    // A tool failure is not a clean bill of health — never let a broken command
+    // read as "no issues found". Escalate to a human rather than guess.
+    toolFailure = true
+    log(`Codex review command itself failed on round ${round} (exit ${reviewRun ? reviewRun.exitCode : 'unknown'}) — this is a tooling failure, not a clean review.`)
+    break
+  }
 
   const verdict = await agent(
     `Here is an independent code reviewer's raw output on an uncommitted diff:\n\n${lastReview}\n\nDoes it identify any real, actionable issue that should block this change from being committed?`,
@@ -90,6 +120,8 @@ while (round < MAX_REVIEW_ROUNDS && !clean) {
 phase('Report')
 if (clean) {
   log(`Clean adversarial review after ${round} round(s).`)
+} else if (toolFailure) {
+  log(`Codex review tooling failed on round ${round} — no verdict was ever produced. Escalating to human.`)
 } else {
   log(`Stopped after ${MAX_REVIEW_ROUNDS} rounds without a clean review — escalating to human.`)
 }
@@ -99,9 +131,12 @@ return {
   branch,
   rounds: round,
   clean,
+  toolFailure,
   operatorSummary: implementResult,
   lastCodexReview: lastReview,
   nextAction: clean
     ? 'Review the diff in the worktree yourself, then explicitly approve commit and push. This workflow never commits or pushes on its own.'
-    : `Codex found unresolved issues after ${MAX_REVIEW_ROUNDS} rounds. Review the worktree and findings, then decide whether to redirect the Operator or discard the worktree — do not force a commit past unresolved findings.`,
+    : toolFailure
+      ? 'The codex CLI invocation itself failed (see lastCodexReview) — this was never a real review. Fix the command before retrying; do not treat this as an approved change.'
+      : `Codex found unresolved issues after ${MAX_REVIEW_ROUNDS} rounds. Review the worktree and findings, then decide whether to redirect the Operator or discard the worktree — do not force a commit past unresolved findings.`,
 }
