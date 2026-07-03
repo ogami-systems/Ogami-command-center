@@ -33,6 +33,7 @@ import agent
 import db as dbmod
 from accounts.registry import AccountRegistry
 from config import Config
+from redact import redact
 
 logger = logging.getLogger(__name__)
 
@@ -127,8 +128,9 @@ def build_application(
             database.update_status(approval_id, dbmod.EXECUTED, result=result)
             await query.edit_message_text(f"Approved and executed: {approval.tool_name}")
         except Exception as exc:  # noqa: BLE001 — surface any failure to Michael, never retry silently
-            database.update_status(approval_id, dbmod.FAILED, result={"error": str(exc)})
-            await query.edit_message_text(f"Approved but failed: {approval.tool_name} — {exc}")
+            safe_error = redact(str(exc))
+            database.update_status(approval_id, dbmod.FAILED, result={"error": safe_error})
+            await query.edit_message_text(f"Approved but failed: {approval.tool_name} — {safe_error}")
         await query.answer()
 
     application.add_handler(CommandHandler("briefing", briefing_command))

@@ -11,13 +11,13 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 
 REQUIRED_VARS = [
-    "ANTHROPIC_API_KEY",
+    # Only what Saint's Telegram interface itself needs to boot at all. Everything
+    # else (Anthropic key, Google client credentials) is validated at first real
+    # use instead — a Claude call or a Google API call raises its own clear error
+    # — so connectors can be brought online one at a time (Telegram, then each
+    # Google account, then Docker) without an all-or-nothing wall at startup.
     "TELEGRAM_BOT_TOKEN",
     "TELEGRAM_OWNER_ID",
-    "GOOGLE_PERSONAL_CLIENT_ID",
-    "GOOGLE_PERSONAL_CLIENT_SECRET",
-    "GOOGLE_OGAMI_CLIENT_ID",
-    "GOOGLE_OGAMI_CLIENT_SECRET",
 ]
 
 SECRET_FIELDS = {
@@ -81,16 +81,16 @@ class Config:
             raise ConfigError("TELEGRAM_OWNER_ID must be a numeric Telegram user ID.") from exc
 
         return cls(
-            anthropic_api_key=os.environ["ANTHROPIC_API_KEY"],
+            anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY", ""),
             telegram_bot_token=os.environ["TELEGRAM_BOT_TOKEN"],
             telegram_owner_id=owner_id,
-            google_personal_client_id=os.environ["GOOGLE_PERSONAL_CLIENT_ID"],
-            google_personal_client_secret=os.environ["GOOGLE_PERSONAL_CLIENT_SECRET"],
+            google_personal_client_id=os.environ.get("GOOGLE_PERSONAL_CLIENT_ID", ""),
+            google_personal_client_secret=os.environ.get("GOOGLE_PERSONAL_CLIENT_SECRET", ""),
             google_personal_token_path=_resolve_path(
                 os.environ.get("GOOGLE_PERSONAL_TOKEN_PATH", "secrets/personal_google_token.json")
             ),
-            google_ogami_client_id=os.environ["GOOGLE_OGAMI_CLIENT_ID"],
-            google_ogami_client_secret=os.environ["GOOGLE_OGAMI_CLIENT_SECRET"],
+            google_ogami_client_id=os.environ.get("GOOGLE_OGAMI_CLIENT_ID", ""),
+            google_ogami_client_secret=os.environ.get("GOOGLE_OGAMI_CLIENT_SECRET", ""),
             google_ogami_token_path=_resolve_path(
                 os.environ.get("GOOGLE_OGAMI_TOKEN_PATH", "secrets/ogami_google_token.json")
             ),

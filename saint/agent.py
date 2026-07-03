@@ -23,6 +23,7 @@ import tools
 from accounts.registry import AccountRegistry
 from config import Config
 from db import Database
+from redact import redact
 
 STANDARD = "standard"
 HEAVY = "heavy"
@@ -200,7 +201,9 @@ def run_turn(run: Run, client: anthropic.Anthropic, messages: list) -> str:
             try:
                 result = tools.dispatch(block.name, run.registry, **block.input)
             except Exception as exc:
-                result = {"error": str(exc)}
+                # redact(): this text can reach Michael via the model's reply, so it
+                # must never carry a credential-bearing URL or token (see redact.py).
+                result = {"error": redact(str(exc))}
             tool_results.append(_tool_result(block.id, result))
 
         messages.append({"role": "user", "content": tool_results})

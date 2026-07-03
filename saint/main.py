@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import sys
+import traceback
 
 import anthropic
 
@@ -19,15 +21,57 @@ import telegram_bot
 from accounts.registry import AccountRegistry
 from config import Config
 from db import Database
+from redact import redact
 
 logger = logging.getLogger(__name__)
 
+# These libraries can log full outbound request URLs at INFO level. Telegram's
+# Bot API embeds the token directly in the URL path (unlike Anthropic/Google,
+# which use Authorization headers), so an unmuted httpx/telegram logger would
+# print the token in plain text. Force these to WARNING regardless of
+# SAINT_LOG_LEVEL, so a future "turn on DEBUG for my own app logic" session
+# never accidentally re-exposes a credential.
+_QUIET_LOGGER_NAMES = [
+    "httpx",
+    "httpcore",
+    "telegram",
+    "telegram.ext",
+    "telegram.request",
+    "googleapiclient",
+    "googleapiclient.discovery",
+    "google.auth",
+    "google_auth_httplib2",
+    "urllib3",
+    "requests",
+    "anthropic",
+]
+
+
+class RedactingFormatter(logging.Formatter):
+    """Redacts credential-shaped substrings from every formatted log line,
+    including exception tracebacks (exc_info) — see redact.py for why a
+    logger-level mute alone isn't sufficient."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        return redact(super().format(record))
+
 
 def _setup_logging(level: str) -> None:
-    logging.basicConfig(
-        level=getattr(logging, level.upper(), logging.INFO),
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
+    handler = logging.StreamHandler()
+    handler.setFormatter(RedactingFormatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    logging.basicConfig(level=getattr(logging, level.upper(), logging.INFO), handlers=[handler])
+
+    for name in _QUIET_LOGGER_NAMES:
+        logging.getLogger(name).setLevel(logging.WARNING)
+
+    def _redacting_excepthook(exc_type, exc_value, exc_tb) -> None:
+        # A safety net for exceptions that never pass through the logging module at
+        # all — e.g. one that propagates out of main() past asyncio.run() to
+        # Python's default top-level handler, which prints straight to stderr.
+        text = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+        sys.stderr.write(redact(text))
+
+    sys.excepthook = _redacting_excepthook
 
 
 async def _startup_reconciliation(config: Config, database: Database, application) -> None:
@@ -41,10 +85,13 @@ async def _startup_reconciliation(config: Config, database: Database, applicatio
     still_pending = database.list_pending()
     if still_pending:
         names = ", ".join(f"#{a.id} {a.tool_name}" for a in still_pending)
-        await application.bot.send_message(
-            chat_id=config.telegram_owner_id,
-            text=f"Saint restarted. {len(still_pending)} approval(s) still awaiting your decision: {names}",
-        )
+        try:
+            await application.bot.send_message(
+                chat_id=config.telegram_owner_id,
+                text=f"Saint restarted. {len(still_pending)} approval(s) still awaiting your decision: {names}",
+            )
+        except Exception as exc:  # noqa: BLE001 — never let a notification failure crash startup
+            logger.error("Failed to send restart-reconciliation message: %s", redact(str(exc)))
 
 
 async def main() -> None:
