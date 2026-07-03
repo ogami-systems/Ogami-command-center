@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "defaults": {
+    "security": "deny",
+    "ask": "always",
+    "askFallback": "deny"
+  },
+  "agents": {
+    "ogami-operator": {
+      "security": "allowlist",
+      "ask": "on-miss",
+      "askFallback": "deny",
+      "allowlist": [
+        { "pattern": "*/git", "argPattern": "^(status|diff|show|log|add|worktree) " },
+        { "pattern": "*/rg" },
+        { "pattern": "*/node", "argPattern": "^--test" },
+        { "pattern": "*/npm", "argPattern": "^(test|run lint|run build) " }
+      ]
+    }
+  }
+}

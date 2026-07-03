@@ -27,7 +27,7 @@ Its governing principle is the Model & Cost Philosophy in `CLAUDE.md` §5 and th
 | **Heavy reasoning** | Claude Opus | Architecture, security, workflow design, client-data boundaries, approval logic, difficult debugging, irreversible decisions |
 | **Standard reasoning** | Claude Sonnet | Drafting, summarization, audits, most workflow steps, day-to-day judgment |
 | **Fast / bulk** | Groq Llama 70B · Groq Qwen · Groq GPT OSS | High-volume classification, simple extraction, routine formatting, cheap parallel work |
-| **Cross-check (alternate)** | GPT-5.5 | Independent second opinion on high-stakes output; diversity when one model's bias is a risk |
+| **Cross-check (alternate)** | GPT-5.5 · OpenAI Codex CLI (code review) | Independent second opinion on high-stakes output; diversity when one model's bias is a risk. For code specifically, Codex CLI is invoked directly (`codex exec review`), not roleplayed by another tier — the value is a genuinely separate model, not a persona. |
 
 Tiers map to decision cost: the higher the cost of being wrong (`CLAUDE.md` §6 — reversibility, security, financial, blast radius), the higher the tier required.
 
@@ -62,3 +62,4 @@ When a step spans multiple classes, the most restrictive class sets the minimum 
 ## Current consumers
 
 - `02-agents/repo-steward.md` — read-only audit; routes to **Standard** (Sonnet) by default, escalating to **Heavy** only when asked to judge the severity of architectural drift.
+- `02-agents/ogami-operator.md` — implementation; routes to **Standard** (Sonnet) by default, escalating to **Heavy** for architecturally significant changes. Its adversarial review step in `03-workflows/build-and-review.md` routes to **Cross-check** (Codex CLI) — the first real consumer of that tier.

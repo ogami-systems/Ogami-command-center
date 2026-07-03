@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -r -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git clean -fd *)",
+      "Bash(git clean -f *)",
+      "Bash(chmod -R 777 *)",
+      "Bash(launchctl *)",
+      "Bash(diskutil *)",
+      "Read(//Users/*/.ssh/**)",
+      "Read(//Users/*/.aws/**)",
+      "Read(//Users/*/.openclaw/auth.json)",
+      "Read(//Users/*/.codex/auth.json)"
+    ]
+  }
+}
