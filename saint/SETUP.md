@@ -17,6 +17,7 @@ source .venv/bin/activate
 python --version   # confirm 3.12.x, not 3.9.x
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install -r requirements-dev.txt   # only needed to run the test suite (pytest)
 ```
 
 ## 2. Google Cloud — two separate OAuth clients
