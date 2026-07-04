@@ -16,6 +16,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
+from accounts.gmail_safety import SafeGmailService
+
 
 class AuthRequiredError(RuntimeError):
     """Raised when an account has no usable token. The fix is always the same:
@@ -70,7 +72,17 @@ class GoogleAccount:
         return self._services[key]
 
     def get_gmail_service(self):
-        return self._get_service("gmail", "v1")
+        # Wrapped in SafeGmailService (defense-in-depth Layer 2, see
+        # saint/GMAIL_ARCHITECTURE.md): the gmail.modify scope technically
+        # permits send, but the returned client refuses to call it regardless
+        # of who asks or why. Lifting this requires a hardcoded allow_send=True
+        # here — never a config/env toggle.
+        key = ("gmail", "v1")
+        if key not in self._services:
+            creds = self._load_credentials()
+            raw = build("gmail", "v1", credentials=creds, cache_discovery=False)
+            self._services[key] = SafeGmailService(raw)
+        return self._services[key]
 
     def get_drive_service(self):
         return self._get_service("drive", "v3")

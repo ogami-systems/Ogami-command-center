@@ -13,6 +13,7 @@ governed-by:
 references:
   - saint/README.md
   - saint/SETUP.md
+  - saint/GMAIL_ARCHITECTURE.md
 ---
 
 # Saint
@@ -47,16 +48,21 @@ which tools are gated (`CONSEQUENTIAL`) and which action class each maps to —
 lives in that file's module docstring; this document links to it rather than
 restating it, per `01-rules/authoring-standard.md`.
 
-- **Gmail** (`gmail_tools.py`): search, read, trash, label. No send/compose
-  tool exists anywhere in the codebase. **Correction (2026-07-04):** the
-  currently-requested `gmail.modify` scope itself permits Gmail's send
-  endpoint at the OAuth/API level — confirmed directly against Google's API
-  reference, not assumed. The no-send guarantee here is therefore a
-  code-level one (no function ever calls it), not an OAuth-level one, until
-  Michael's final scope decision is resolved (Google's scope model has no way
-  to grant draft/label/archive management without also granting send — see
-  the Trust Model section below for the honest-guarantee framing this
-  implies). See `saint/accounts/registry.py` for the current scope value.
+- **Gmail** (`gmail_tools.py`): search and read are ungated. Every write
+  operation — archive, trash, restore, mark read/unread, label, draft
+  create/update, reply draft — is consequential, gated by default, per
+  Michael's explicit decision. No send/reply-send tool exists anywhere in the
+  codebase, and permanent deletion is impossible at the OAuth layer (requires
+  `mail.google.com`, never requested). Full rationale, the four-layer
+  defense-in-depth design, and the per-capability scope/reversibility table:
+  `saint/GMAIL_ARCHITECTURE.md`. Decided 2026-07-04: `gmail.modify` is used
+  (it technically permits send at the OAuth level — Google's scope model has
+  no way to grant archive/label/draft without also granting send), so the
+  no-send guarantee is enforced independently of OAuth by
+  `accounts/gmail_safety.py`'s `SafeGmailService` (unconditionally blocks the
+  send endpoint at the service-object level, liftable only by a hardcoded,
+  non-configurable code change) plus the fact that no send tool is ever
+  registered.
 - **Calendar** (`calendar_tools.py`): read is ungated; create and delete are
   consequential.
 - **Drive/Docs** (`drive_tools.py`): search, read, create — all ungated (Docs
@@ -64,7 +70,9 @@ restating it, per `01-rules/authoring-standard.md`.
   class and must be added to `CONSEQUENTIAL`).
 - **Sheets** (`sheets_tools.py`): read is ungated; append is consequential.
 - **Tasks** (`tasks_tools.py`): list, create, complete — ungated (low-stakes,
-  reversible personal reminders, the same judgment call as Gmail trash).
+  reversible personal reminders with no external visibility — unlike Gmail,
+  which is gated by default per Michael's stricter Gmail-specific decision
+  above, not because Tasks and Gmail share a risk tier).
 
 ## Model tier
 
@@ -161,7 +169,10 @@ emails remain untrusted data throughout.
 The per-tool `CONSEQUENTIAL` gating table already referenced under Tool
 allowlist above is the enforcement point — not restated here. The relevant
 guarantee: no untrusted content, however persuasive, can cause an approval to
-reach `approved`. Only a verified owner Telegram tap can.
+reach `approved`. Only a verified owner Telegram tap can. Gmail specifically
+has an additional, independent layer beyond this one: see
+`saint/GMAIL_ARCHITECTURE.md` for why send needs a service-level block, not
+just an approval gate, given what `gmail.modify` technically permits.
 
 ### Onboarding a new trusted command source (8-step gate)
 

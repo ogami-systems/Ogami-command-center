@@ -219,6 +219,37 @@ def test_no_send_capable_tool_exists():
     assert not any("send" in scope for scope in ALL_SCOPES), f"a send-shaped scope is requested: {ALL_SCOPES}"
 
 
+def test_gmail_service_is_safe_gmail_service():
+    """Ties the "no tool" guarantee above to the "even if there were one"
+    guarantee (saint/GMAIL_ARCHITECTURE.md Layer 2): get_gmail_service() must
+    never return the raw client directly."""
+    from unittest.mock import MagicMock, patch
+
+    from accounts.gmail_safety import SafeGmailService
+    from accounts.google_account import GoogleAccount
+
+    account = GoogleAccount(name="test", client_id="x", client_secret="y", token_path="/tmp/nonexistent", scopes=[])
+    with patch.object(account, "_load_credentials", return_value=MagicMock()), patch(
+        "accounts.google_account.build", return_value=MagicMock()
+    ):
+        service = account.get_gmail_service()
+    assert isinstance(service, SafeGmailService)
+
+
+def test_every_gmail_write_tool_is_gated():
+    """Trust Model / GMAIL_ARCHITECTURE.md guarantee: every Gmail write
+    operation is consequential by default; only search and read are not."""
+    gmail_tool_names = {t["name"] for t in tools.TOOLS if t["name"].startswith("gmail_")}
+    ungated_reads = {"gmail_search", "gmail_read_messages"}
+    expected_writes = gmail_tool_names - ungated_reads
+
+    assert expected_writes, "expected at least one Gmail write tool to exist"
+    for name in expected_writes:
+        assert name in tools.CONSEQUENTIAL, f"Gmail write tool '{name}' must be gated but isn't"
+    for name in ungated_reads:
+        assert name not in tools.CONSEQUENTIAL, f"Gmail read tool '{name}' must stay ungated but is gated"
+
+
 # --- 8: dispatch() fails closed on an unknown tool name ---
 
 
