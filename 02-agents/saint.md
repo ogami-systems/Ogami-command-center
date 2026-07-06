@@ -20,10 +20,11 @@ references:
 
 ## Identity
 
-A personal executive-assistant agent operating on Michael's behalf across two
+A personal executive-assistant agent operating on Michael's behalf across three
 Google account contexts — `personal_google` (personal Gmail/Drive/Calendar/
-Tasks) and `ogami_google` (the Ogami business account) — with Telegram as the
-interface. Status is `draft`, not `active`, because the code is built and
+Tasks), `ogami_google` (the Ogami business account), and `imago_google` (the
+Imago / church operations account) — with Telegram as the interface. Status
+is `draft`, not `active`, because the code is built and
 smoke-tested at the component level but has not yet completed a live end-to-end
 run against real Google/Telegram credentials (see `saint/SETUP.md`); promote to
 `active` once that first live smoke test passes.
@@ -209,8 +210,8 @@ Four guarantees, deliberately not compressed into one blanket claim:
    `approved` except via the single owner-gated Telegram callback path.
 4. **Best-effort, not tested, not claimed as solved** — whether the model's
    summaries, judgment about which action to propose, or choice of account
-   (`personal_google` vs `ogami_google`) can be influenced by adversarial
-   content. Prompt-injection-resistant model behavior is an unsolved,
+   (`personal_google` vs `ogami_google` vs `imago_google`) can be influenced
+   by adversarial content. Prompt-injection-resistant model behavior is an unsolved,
    industry-wide problem; the `SYSTEM_PROMPT` hardening in `agent.py` is
    defense-in-depth, not the security boundary. This trust model guarantees
    the *consequence* of a manipulated model is contained (nothing executes

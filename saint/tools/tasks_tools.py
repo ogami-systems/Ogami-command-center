@@ -16,7 +16,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "tasklist_id": {"type": "string", "default": "@default"},
                 "show_completed": {"type": "boolean", "default": False},
             },
@@ -29,7 +29,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "title": {"type": "string"},
                 "notes": {"type": "string"},
                 "due": {"type": "string", "description": "RFC3339 due date"},
@@ -44,7 +44,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "task_id": {"type": "string"},
                 "tasklist_id": {"type": "string", "default": "@default"},
             },

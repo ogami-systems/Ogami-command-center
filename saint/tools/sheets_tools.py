@@ -21,7 +21,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "spreadsheet_id": {"type": "string"},
                 "range": {"type": "string", "description": "A1 notation, e.g. 'Sheet1!A1:D20'"},
             },
@@ -37,7 +37,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "spreadsheet_id": {"type": "string"},
                 "range": {"type": "string", "description": "A1 notation, e.g. 'Sheet1!A:D'"},
                 "values": {

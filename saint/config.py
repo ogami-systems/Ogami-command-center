@@ -25,6 +25,7 @@ SECRET_FIELDS = {
     "telegram_bot_token",
     "google_personal_client_secret",
     "google_ogami_client_secret",
+    "google_imago_client_secret",
     "spotify_client_secret",
 }
 
@@ -51,6 +52,10 @@ class Config:
     google_ogami_client_id: str
     google_ogami_client_secret: str
     google_ogami_token_path: Path
+
+    google_imago_client_id: str
+    google_imago_client_secret: str
+    google_imago_token_path: Path
 
     spotify_client_id: str = ""
     spotify_client_secret: str = ""
@@ -93,6 +98,11 @@ class Config:
             google_ogami_client_secret=os.environ.get("GOOGLE_OGAMI_CLIENT_SECRET", ""),
             google_ogami_token_path=_resolve_path(
                 os.environ.get("GOOGLE_OGAMI_TOKEN_PATH", "secrets/ogami_google_token.json")
+            ),
+            google_imago_client_id=os.environ.get("GOOGLE_IMAGO_CLIENT_ID", ""),
+            google_imago_client_secret=os.environ.get("GOOGLE_IMAGO_CLIENT_SECRET", ""),
+            google_imago_token_path=_resolve_path(
+                os.environ.get("GOOGLE_IMAGO_TOKEN_PATH", "secrets/imago_google_token.json")
             ),
             spotify_client_id=os.environ.get("SPOTIFY_CLIENT_ID", ""),
             spotify_client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET", ""),

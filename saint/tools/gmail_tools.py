@@ -44,7 +44,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "query": {"type": "string", "description": "Gmail search query syntax"},
                 "max_results": {"type": "integer", "default": 10},
             },
@@ -57,7 +57,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_ids": {"type": "array", "items": {"type": "string"}},
             },
             "required": ["account", "message_ids"],
@@ -72,7 +72,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_id": {"type": "string"},
             },
             "required": ["account", "message_id"],
@@ -87,7 +87,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_id": {"type": "string"},
             },
             "required": ["account", "message_id"],
@@ -99,7 +99,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_id": {"type": "string"},
             },
             "required": ["account", "message_id"],
@@ -111,7 +111,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_id": {"type": "string"},
                 "read": {"type": "boolean", "description": "true = mark read, false = mark unread"},
             },
@@ -127,7 +127,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "message_id": {"type": "string"},
                 "add_labels": {"type": "array", "items": {"type": "string"}, "default": []},
                 "remove_labels": {"type": "array", "items": {"type": "string"}, "default": []},
@@ -144,7 +144,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "to": {"type": "string"},
                 "subject": {"type": "string"},
                 "body": {"type": "string"},
@@ -158,7 +158,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "draft_id": {"type": "string"},
                 "to": {"type": "string"},
                 "subject": {"type": "string"},
@@ -177,7 +177,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "thread_id": {"type": "string"},
                 "to": {"type": "string"},
                 "subject": {"type": "string"},

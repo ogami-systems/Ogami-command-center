@@ -1,5 +1,6 @@
-"""Maps account names ("personal_google", "ogami_google") to configured GoogleAccount
-instances. Built once in main.py and threaded down into tools and agent.py.
+"""Maps account names ("personal_google", "ogami_google", "imago_google") to
+configured GoogleAccount instances. Built once in main.py and threaded down
+into tools and agent.py.
 
 Scopes are hardcoded here, not read from .env — making them a runtime knob would let
 a future edit silently request a broader scope (e.g. gmail.send). Changing what Saint
@@ -23,7 +24,8 @@ ALL_SCOPES = GMAIL_SCOPES + DRIVE_SCOPES + CALENDAR_SCOPES + TASKS_SCOPES
 
 PERSONAL_GOOGLE = "personal_google"
 OGAMI_GOOGLE = "ogami_google"
-ACCOUNT_NAMES = [PERSONAL_GOOGLE, OGAMI_GOOGLE]
+IMAGO_GOOGLE = "imago_google"
+ACCOUNT_NAMES = [PERSONAL_GOOGLE, OGAMI_GOOGLE, IMAGO_GOOGLE]
 
 
 class AccountRegistry:
@@ -41,6 +43,13 @@ class AccountRegistry:
                 client_id=config.google_ogami_client_id,
                 client_secret=config.google_ogami_client_secret,
                 token_path=config.google_ogami_token_path,
+                scopes=ALL_SCOPES,
+            ),
+            IMAGO_GOOGLE: GoogleAccount(
+                name=IMAGO_GOOGLE,
+                client_id=config.google_imago_client_id,
+                client_secret=config.google_imago_client_secret,
+                token_path=config.google_imago_token_path,
                 scopes=ALL_SCOPES,
             ),
         }

@@ -19,7 +19,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "query": {"type": "string", "description": "Drive search query, e.g. \"name contains 'budget'\""},
                 "max_results": {"type": "integer", "default": 10},
             },
@@ -32,7 +32,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "document_id": {"type": "string"},
             },
             "required": ["account", "document_id"],
@@ -44,7 +44,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "title": {"type": "string"},
                 "content": {"type": "string"},
             },

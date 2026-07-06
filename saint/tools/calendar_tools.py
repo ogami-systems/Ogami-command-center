@@ -22,7 +22,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "calendar_id": {"type": "string", "default": "primary"},
                 "time_min": {"type": "string", "description": "RFC3339 timestamp, defaults to now"},
                 "time_max": {
@@ -43,7 +43,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "calendar_id": {"type": "string", "default": "primary"},
                 "summary": {"type": "string"},
                 "start": {"type": "string", "description": "RFC3339 start datetime"},
@@ -63,7 +63,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "account": {"type": "string", "enum": ["personal_google", "ogami_google"]},
+                "account": {"type": "string", "enum": ["personal_google", "ogami_google", "imago_google"]},
                 "calendar_id": {"type": "string", "default": "primary"},
                 "event_id": {"type": "string"},
             },
