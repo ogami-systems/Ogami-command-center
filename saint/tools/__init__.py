@@ -7,14 +7,26 @@ enforcer, reading this aggregated table, rather than trusting each module.
 Per-tool action-class assignments (the authoritative table — 02-agents/saint.md links
 here rather than restating it, per authoring-standard.md's single-source-of-truth rule):
 
-| Tool                   | Action class  | Tier floor (model-routing.md) |
-|-------------------------|--------------|--------------------------------|
-| create_calendar_event    | Communicate  | Standard                       |
-| delete_calendar_event    | Destructive  | Heavy (forced)                 |
-| sheets_append            | Communicate  | Standard                       |
+| Tool                      | Action class  | Tier floor (model-routing.md) |
+|----------------------------|--------------|--------------------------------|
+| gmail_archive_message       | Communicate  | Standard                       |
+| gmail_trash_message         | Communicate  | Standard                       |
+| gmail_untrash_message       | Communicate  | Standard                       |
+| gmail_mark_read_status      | Communicate  | Standard                       |
+| gmail_modify_labels         | Communicate  | Standard                       |
+| gmail_create_draft          | Communicate  | Standard                       |
+| gmail_update_draft          | Communicate  | Standard                       |
+| gmail_create_reply_draft    | Communicate  | Standard                       |
+| create_calendar_event       | Communicate  | Standard                       |
+| delete_calendar_event       | Destructive  | Heavy (forced)                 |
+| sheets_append               | Communicate  | Standard                       |
 
-Everything else (Gmail search/read/trash/label, Drive/Docs read+create, Sheets read,
-Calendar read, Tasks CRUD) is Read/Draft class and ungated.
+Every Gmail write is gated by default, per Michael's explicit decision (see
+saint/GMAIL_ARCHITECTURE.md) — this was tightened after this table's original
+version, which listed Gmail trash/label as ungated; that is no longer true.
+
+Everything else (Gmail search/read, Drive/Docs read+create, Sheets read,
+Calendar read, Tasks list/create/complete) is Read/Draft class and ungated.
 """
 
 from __future__ import annotations

@@ -56,3 +56,38 @@ The Growth Packet, wind-down/weekly-review scheduler jobs, weather/Notion/
 package-tracking tools, self-improving news filter, quote/devotional seeding,
 and the portfolio-tracking Sheet template are all future work layered on this
 foundation — not part of Phase A.
+
+## Future architecture directions (not yet implemented)
+
+**Trust-boundary approval model.** Michael has agreed in principle (2026-07-06)
+to eventually replace the current consequence/risk-based gating (each write
+individually classified by its actual real-world risk — see `tools/__init__.py`'s
+`CONSEQUENTIAL` table and `GMAIL_ARCHITECTURE.md`) with a simpler trust-boundary
+model:
+
+> Saint can freely observe the outside world.
+> Saint can freely manage its own internal state.
+> Saint asks before changing anything outside itself.
+
+Concretely: reads always ungated; writes to Saint's own internal state (memory,
+its SQLite db, logs, The Mine once built, caches) always ungated; any write to
+an external system (Gmail, Calendar, Docs, Sheets, Tasks, and future Notion/CRM/
+API integrations) gated by default. This is a generalization of the same
+default-deny-plus-explicit-override pattern already used for Gmail's
+`SafeGmailService` — applied to the whole tool surface instead of one service.
+
+Adopting it would gate three currently-ungated tools that don't touch a
+particularly risky surface (`docs_create`, `tasks_create`, `tasks_complete`) —
+a deliberate, bounded friction tradeoff in exchange for a gating rule that
+never needs re-litigating per tool and is robust to sloppy future additions.
+Rollout, if and when undertaken: apply the boundary rule to all new
+external-write tools going forward with zero disruption to what exists, then
+separately and explicitly decide the fate of those three existing exceptions —
+not a passive side effect of adopting the philosophy. Scoped/bulk approvals
+(e.g. "approve all task creation for this meeting") are a candidate future
+mechanism to recover usability without diluting the simple rule, but are a
+separate feature with their own security surface, deserving their own design
+pass when actually built.
+
+Not implemented. No code or `CONSEQUENTIAL` table changes have been made under
+this direction — it is a documented intent to revisit, not a current policy.
