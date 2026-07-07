@@ -61,10 +61,10 @@ On demand, once per machine (MacBook and Mac mini each run this independently �
       "ask": "on-miss",
       "askFallback": "deny",
       "allowlist": [
-        { "pattern": "*/git", "argPattern": "^(status|diff|show|log|add|worktree) " },
-        { "pattern": "*/rg" },
-        { "pattern": "*/node", "argPattern": "^--test" },
-        { "pattern": "*/npm", "argPattern": "^(test|run lint|run build) " }
+        { "pattern": "**/git", "argPattern": "^(status|diff|show|log|add|worktree) " },
+        { "pattern": "**/rg" },
+        { "pattern": "**/node", "argPattern": "^--test" },
+        { "pattern": "**/npm", "argPattern": "^(test|run lint|run build) " }
       ]
     }
   }
@@ -111,3 +111,9 @@ Distinct from the dry-run above, which exercised `build-and-review.js` through C
 - **Live human approval prompt not yet tested.** This run had no one actively watching an OpenClaw approval channel to answer the ask — that path (a human actually seeing and resolving a live prompt) remains unverified.
 - **Allowlist `argPattern` did not match as intended.** `git worktree add` was meant to be tier-1 (auto-run, no prompt) per the `argPattern` scoped to `status|diff|show|log|add|worktree`. Instead it received the same treatment as an unlisted command. Root cause not yet diagnosed — plausibly whether `argPattern` is matched against the arguments alone or the full command line including `git` itself.
 - **Assessment: the remaining issue is allowlist tuning, not core safety.** The gate's failure mode is over-blocking (denies things intended to be frictionless), never under-blocking (nothing unapproved got through). Deliberately not debugged or widened as part of this entry — allowlist tuning is separate follow-up work, tracked here rather than acted on now.
+
+### 2026-07-07 — Allowlist pattern fix (MacBook, dev)
+
+Root cause found by reading OpenClaw's own matching source, not guessed. `argPattern` was never the problem — it's tested against `argv.slice(1)` joined with spaces, and the original `^(status|diff|show|log|add|worktree) ` correctly matches `git worktree add ...`. The actual bug was one level up: the `pattern` field's single `*` compiles to `[^/]*`, which matches only *within one path segment* and can never cross a `/`. Every resolved binary path (`/usr/bin/git`, `/opt/homebrew/bin/node`, etc.) has multiple segments, so `*/git`, `*/rg`, `*/node`, and `*/npm` could never match anything — **all four allowlist entries were non-functional from the moment they were created**, not just the worktree case. Verified empirically by compiling OpenClaw's own glob logic in isolation and testing it against `git`'s real resolved path (`/usr/bin/git`): `*/git` → no match, `**/git` → match.
+
+Fix: changed `*` to `**` in all four `pattern` values (`**/git`, `**/rg`, `**/node`, `**/npm`), applied to both the live `~/.openclaw/exec-approvals.json` and this repo's `03-workflows/exec-approvals.ogami-operator.json`. Nothing else changed — every `argPattern`, `defaults`, and `ask`/`security`/`askFallback` value is byte-for-byte identical to before. This only makes the already-intended restriction actually take effect; it grants nothing new.
