@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drop Control — S&W Craft Roasting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ DESIGN TOKENS — kraft paper & roast flame ============ */
+:root{
+  --paper:#EFE6D8;          /* unbleached paper */
+  --paper-deep:#E6DAC5;
+  --card:#F6EFE2;
+  --kraft:#E9DCC0;
+  --kraft-deep:#DECDA8;
+  --bean:#3B2A20;           /* roasted-bean brown */
+  --bean-soft:#5C4433;
+  --burlap:#C9B393;
+  --amber:#D98E32;          /* roast-flame — primary actions only */
+  --amber-deep:#B87322;
+  --soldout:#B4372F;        /* sparingly */
+  --ink-faint:rgba(59,42,32,.55);
+  --line:rgba(59,42,32,.16);
+  --line-strong:rgba(59,42,32,.3);
+  --stencil:'Saira Stencil One', 'Arial Black', sans-serif;
+  --ui:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow:0 2px 8px rgba(59,42,32,.10);
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-gutter:stable}
+body{
+  font-family:var(--ui);
+  background:var(--paper);
+  background-image:radial-gradient(rgba(59,42,32,.035) 1px, transparent 1.4px);
+  background-size:26px 26px;
+  color:var(--bean);
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:var(--ui);cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+/* ============ SHELL ============ */
+header.top{
+  background:var(--bean);
+  color:var(--paper);
+  padding:0 20px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  position:sticky;top:0;z-index:40;
+}
+.brand{display:flex;align-items:baseline;gap:10px;padding:12px 0}
+.brand .logo{font-family:var(--stencil);font-size:1.35rem;letter-spacing:.06em;color:var(--paper)}
+.brand .sub{font-size:.72rem;color:var(--burlap);letter-spacing:.14em;text-transform:uppercase}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{
+  background:none;border:none;color:var(--burlap);
+  font-size:.85rem;font-weight:600;padding:16px 13px 13px;
+  border-bottom:3px solid transparent;white-space:nowrap;position:relative;
+}
+nav.tabs button:hover{color:var(--paper)}
+nav.tabs button[aria-selected="true"]{color:var(--paper);border-bottom-color:var(--amber)}
+nav.tabs .dot{position:absolute;top:10px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--amber);display:none}
+nav.tabs .dot.on{display:block}
+#resetBtn{
+  background:none;border:1px solid rgba(239,230,216,.35);color:var(--burlap);
+  font-size:.75rem;padding:6px 12px;border-radius:6px;margin:8px 0;
+}
+#resetBtn:hover{color:var(--paper);border-color:var(--paper)}
+main{max-width:1240px;margin:0 auto;padding:22px 20px 80px}
+section.panel{display:none}
+section.panel.active{display:block}
+h1.screen{
+  font-family:var(--stencil);font-size:clamp(1.5rem,3.4vw,2.2rem);
+  letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;
+}
+.screen-sub{color:var(--ink-faint);margin-bottom:20px;font-size:.92rem}
+
+/* ============ SHARED BITS ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.btn{
+  border:none;border-radius:8px;font-weight:700;font-size:.9rem;
+  padding:11px 18px;transition:transform .08s ease, background .15s ease;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--amber);color:#2A1D12}
+.btn-primary:hover{background:var(--amber-deep);color:var(--paper)}
+.btn-primary:disabled{background:var(--burlap);color:rgba(59,42,32,.5);cursor:not-allowed}
+.btn-quiet{background:none;border:1.5px solid var(--line-strong);color:var(--bean)}
+.btn-quiet:hover{background:var(--paper-deep)}
+.chip{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.chip.awaiting{border:1.5px solid var(--burlap);color:var(--bean-soft)}
+.chip.roasted{background:rgba(217,142,50,.22);color:var(--amber-deep)}
+.chip.labeled{background:rgba(92,68,51,.16);color:var(--bean)}
+.chip.shipped{background:var(--bean);color:var(--paper)}
+.chip.refunded{border:1.5px solid var(--soldout);color:var(--soldout)}
+.chip.updated{background:var(--amber);color:#2A1D12}
+.chip.soldout{background:var(--soldout);color:var(--paper);letter-spacing:.05em}
+.meter{height:12px;background:var(--paper-deep);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.meter > i{display:block;height:100%;background:var(--amber);border-radius:99px;transition:width .3s ease}
+.meter.drain > i{background:var(--bean-soft)}
+.ghost{color:var(--ink-faint);font-size:.78rem;font-style:italic}
+.stat-num{font-family:var(--stencil);font-size:1.9rem;line-height:1.1}
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  background:var(--bean);color:var(--paper);padding:12px 20px;border-radius:8px;
+  box-shadow:0 6px 24px rgba(0,0,0,.28);font-size:.88rem;z-index:90;max-width:92vw;
+}
+
+/* ============ TODAY — the sheet ============ */
+.today-grid{display:grid;grid-template-columns:1fr 290px;gap:20px}
+@media(max-width:920px){.today-grid{grid-template-columns:1fr}}
+/* grid items default to min-width:auto — wide scrollable children would blow the track past the viewport */
+.today-grid > *, .drops-grid > *, .cust-grid > *, .inbox-grid > *{min-width:0}
+@media(max-width:430px){.roastdate-stamp{font-size:.76rem;letter-spacing:.07em}}
+.roastdate-stamp{
+  display:inline-block;font-family:var(--stencil);font-size:.95rem;letter-spacing:.12em;
+  border:2.5px solid var(--bean);border-radius:6px;padding:4px 14px;
+  transform:rotate(-1.2deg);color:var(--bean);background:rgba(246,239,226,.6);
+  margin-bottom:14px;
+}
+.tally{display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin:14px 0 20px}
+.tally .block small{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+.tally-meter{flex:1;min-width:180px}
+
+/* hero batch card = big burlap sack tag */
+.hero-tag{
+  position:relative;
+  background:linear-gradient(155deg,var(--kraft) 0%,var(--kraft-deep) 100%);
+  border:1px solid var(--line-strong);border-radius:8px 8px 14px 14px;
+  box-shadow:var(--shadow), inset 0 0 60px rgba(59,42,32,.05);
+  padding:34px 26px 24px;margin-bottom:16px;
+}
+.hero-tag::before{ /* punched hole */
+  content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:16px;height:16px;border-radius:50%;background:var(--paper);
+  box-shadow:inset 0 1px 3px rgba(59,42,32,.5), 0 0 0 4px rgba(201,179,147,.9);
+}
+.hero-tag::after{ /* tie string */
+  content:'';position:absolute;top:-15px;left:calc(50% - 3px);
+  width:30px;height:24px;
+  border-top:2.5px solid rgba(122,94,66,.75);border-left:2.5px solid rgba(122,94,66,.75);
+  border-radius:70% 0 0 0;transform:rotate(-22deg);
+}
+.hero-tag .batchno{font-family:var(--stencil);font-size:clamp(2.6rem,7vw,4.2rem);line-height:1;letter-spacing:.02em}
+.hero-tag .of{font-size:1rem;color:var(--ink-faint);font-family:var(--ui);font-weight:600;letter-spacing:.05em}
+.hero-tag .sku-name{font-size:1.25rem;font-weight:800;margin:8px 0 4px}
+.hero-tag .specs{display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 18px;color:var(--bean-soft);font-size:.92rem}
+.hero-tag .specs b{font-weight:800;color:var(--bean)}
+#markDoneBtn{font-size:1.05rem;padding:15px 30px;width:100%;max-width:360px}
+.alldone{font-family:var(--stencil);font-size:1.6rem;color:var(--amber-deep);letter-spacing:.05em}
+
+/* queue row of small tags */
+.queue-row{display:flex;gap:12px;overflow-x:auto;padding:14px 2px 18px;scroll-snap-type:x proximity}
+.tag-card{
+  scroll-snap-align:start;flex:0 0 148px;position:relative;
+  background:linear-gradient(160deg,var(--kraft),var(--kraft-deep));
+  border:1px solid var(--line-strong);border-radius:6px 6px 10px 10px;
+  padding:22px 12px 12px;min-height:128px;
+  box-shadow:0 1px 4px rgba(59,42,32,.14);
+}
+.tag-card::before{
+  content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  width:10px;height:10px;border-radius:50%;background:var(--paper);
+  box-shadow:inset 0 1px 2px rgba(59,42,32,.5), 0 0 0 3px rgba(201,179,147,.9);
+}
+.tag-card .n{font-family:var(--stencil);font-size:1.7rem;line-height:1}
+.tag-card .s{font-size:.78rem;font-weight:700;margin-top:4px}
+.tag-card .t{font-size:.72rem;color:var(--ink-faint);margin-top:3px}
+.tag-card.next{outline:2.5px solid var(--amber);outline-offset:1px}
+.tag-card.done{opacity:.82}
+.stamp{
+  position:absolute;top:34%;left:6%;transform:rotate(-9deg);
+  font-family:var(--stencil);color:rgba(180,55,47,.82);
+  border:3px double rgba(180,55,47,.7);border-radius:5px;
+  padding:1px 8px;letter-spacing:.13em;font-size:1.05rem;
+  mix-blend-mode:multiply;pointer-events:none;
+}
+.stamp.big{font-size:2rem;top:30%;left:50%;padding:4px 18px;transform:rotate(-8deg)}
+@keyframes stampIn{0%{transform:rotate(-8deg) scale(2.1);opacity:0}60%{transform:rotate(-8deg) scale(.95);opacity:1}100%{transform:rotate(-8deg) scale(1)}}
+.stamp.fresh{animation:stampIn .35s ease-out}
+.rail .card{margin-bottom:14px}
+.rail h3{font-family:var(--stencil);font-size:1rem;letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}
+.rail ul{list-style:none}
+.rail li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.88rem}
+.rail li:last-child{border-bottom:none}
+
+/* ============ DROP MANAGER ============ */
+.drops-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+@media(max-width:980px){.drops-grid{grid-template-columns:1fr}}
+.drop-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.drop-head h2{font-family:var(--stencil);font-size:1.3rem;letter-spacing:.05em}
+.wave-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.wave-list span{font-size:.76rem;background:var(--paper-deep);border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+.inv-row{display:grid;grid-template-columns:minmax(110px,1.1fr) 2fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.inv-row:last-child{border-bottom:none}
+.inv-row .nm{font-weight:700;font-size:.86rem}
+.inv-row .ct{font-size:.8rem;color:var(--ink-faint);min-width:88px;text-align:right;font-variant-numeric:tabular-nums}
+.sim-counters{display:flex;gap:20px;flex-wrap:wrap;margin:16px 0 10px}
+.sim-counters .block{text-align:center;flex:1;min-width:90px;background:var(--paper-deep);border:1px solid var(--line);border-radius:8px;padding:10px 8px}
+.sim-counters small{display:block;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint)}
+.sim-counters .oversell .stat-num{color:var(--amber-deep)}
+#ticker{list-style:none;max-height:240px;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:var(--paper-deep);padding:6px 0}
+#ticker li{padding:5px 14px;font-size:.84rem;border-bottom:1px dashed var(--line)}
+#ticker li.rej{color:var(--ink-faint)}
+#ticker li.rej b{color:var(--soldout);font-weight:700}
+#ticker li:first-child{background:rgba(217,142,50,.13)}
+.sim-banner{
+  margin-top:14px;background:var(--bean);color:var(--paper);border-radius:8px;
+  padding:14px 18px;font-size:.95rem;
+}
+.sim-banner b{color:var(--amber)}
+.drop-done{border-left:4px solid var(--burlap)}
+details.newdrop{margin-top:14px}
+details.newdrop summary{cursor:pointer;font-weight:700;font-size:.88rem;color:var(--bean-soft)}
+details.newdrop form{display:grid;gap:10px;margin-top:12px}
+details.newdrop input[type=text],details.newdrop input[type=date],details.newdrop input[type=number]{
+  font:inherit;padding:8px 10px;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--card);color:var(--bean)}
+.sku-checks{display:flex;flex-wrap:wrap;gap:8px;font-size:.8rem}
+.sku-checks label{display:flex;gap:5px;align-items:center;background:var(--paper-deep);padding:4px 8px;border-radius:6px;border:1px solid var(--line)}
+
+/* ============ ROAST BRAIN ============ */
+.math-lines{margin-bottom:18px}
+.math-lines .ln{font-size:.88rem;padding:7px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.math-lines .ln b{font-weight:800}
+.math-lines .ln .arrow{color:var(--amber-deep);font-weight:700}
+.week-scroll{overflow-x:auto;padding-bottom:8px}
+.week{display:flex;gap:12px;min-width:min-content}
+.day-col{
+  flex:0 0 168px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px;min-height:220px;
+}
+.day-col.today-col{border-color:var(--amber);border-width:2px}
+.day-col.dragover{background:rgba(217,142,50,.12);border-color:var(--amber)}
+.day-col h4{font-size:.82rem;letter-spacing:.03em}
+.day-col .cap{font-size:.72rem;color:var(--ink-faint);margin:2px 0 10px;font-variant-numeric:tabular-nums}
+.day-col .cap.full{color:var(--soldout);font-weight:700}
+.bchip{
+  position:relative;display:block;width:100%;text-align:left;
+  background:linear-gradient(150deg,var(--kraft),var(--kraft-deep));
+  border:1px solid var(--line-strong);border-radius:5px;
+  padding:6px 8px 6px 22px;margin-bottom:6px;font-size:.76rem;font-weight:600;color:var(--bean);
+}
+.bchip::before{content:'';position:absolute;left:8px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%;background:var(--paper);
+  box-shadow:inset 0 1px 1px rgba(59,42,32,.5),0 0 0 2px rgba(201,179,147,.95)}
+.bchip .bn{font-family:var(--stencil);font-size:.88rem;margin-right:4px}
+.bchip[draggable="true"]{cursor:grab}
+.bchip.dragging{opacity:.45}
+.bchip.done-chip{opacity:.55;text-decoration:none;cursor:default}
+.bchip.done-chip::after{content:'ROASTED';position:absolute;right:6px;top:50%;transform:translateY(-50%) rotate(-6deg);
+  font-family:var(--stencil);font-size:.55rem;color:rgba(180,55,47,.8);border:1.5px solid rgba(180,55,47,.6);border-radius:3px;padding:0 3px}
+.move-menu{background:var(--bean);border-radius:8px;padding:8px;margin:-2px 0 8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.move-menu p{color:var(--burlap);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.move-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--paper);
+  font-size:.78rem;padding:5px 7px;border-radius:5px}
+.move-menu button:hover:not(:disabled){background:rgba(217,142,50,.3)}
+.move-menu button:disabled{color:rgba(239,230,216,.35);cursor:not-allowed}
+.downstream{
+  margin-top:16px;background:rgba(217,142,50,.14);border:1.5px solid var(--amber);
+  border-radius:8px;padding:12px 16px;font-size:.88rem;display:none}
+.downstream.on{display:block}
+
+/* ============ FULFILLMENT ============ */
+.ful-top{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.pack-progress{flex:1;min-width:230px}
+.pack-progress .lbl{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:5px}
+.pick-group{margin-bottom:18px}
+.pick-group h3{font-family:var(--stencil);font-size:1rem;letter-spacing:.06em;margin-bottom:2px}
+.pick-group .sub{font-size:.8rem;color:var(--ink-faint);margin-bottom:10px}
+table.orders{width:100%;border-collapse:collapse;font-size:.84rem}
+table.orders th{text-align:left;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);
+  padding:6px 8px;border-bottom:1.5px solid var(--line-strong)}
+table.orders td{padding:8px;border-bottom:1px dashed var(--line);vertical-align:top}
+table.orders tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+.more-row{font-size:.8rem;color:var(--ink-faint);padding:8px;font-style:italic}
+.addr-note{display:block;font-size:.72rem;color:var(--amber-deep);font-weight:700}
+
+/* ============ INBOX ============ */
+.inbox-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+@media(max-width:880px){.inbox-grid{grid-template-columns:1fr}}
+.inbox-stat{background:var(--bean);color:var(--paper);border-radius:var(--r);padding:13px 18px;margin-bottom:16px;font-size:.9rem}
+.inbox-stat b{color:var(--amber)}
+.thread-list{list-style:none}
+.thread-list li button{
+  display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px dashed var(--line);
+  padding:11px 10px;color:var(--bean)}
+.thread-list li button:hover{background:var(--paper-deep)}
+.thread-list li button.sel{background:var(--paper-deep);border-left:3px solid var(--amber)}
+.thread-list .who{font-weight:700;font-size:.86rem;display:flex;justify-content:space-between;gap:6px}
+.thread-list .prev{font-size:.76rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.tagchip{font-size:.62rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--paper-deep);border:1px solid var(--line-strong);white-space:nowrap}
+.tagchip.t-refund{border-color:var(--soldout);color:var(--soldout)}
+.tagchip.t-address{border-color:var(--amber-deep);color:var(--amber-deep)}
+.chan{font-size:.62rem;color:var(--ink-faint);letter-spacing:.06em}
+.msg{max-width:560px;border-radius:12px;padding:11px 14px;margin-bottom:10px;font-size:.9rem}
+.msg.them{background:var(--paper-deep);border:1px solid var(--line)}
+.msg.nick{background:var(--bean);color:var(--paper);margin-left:auto}
+.msg .mt{display:block;font-size:.68rem;color:var(--ink-faint);margin-top:5px}
+.msg.nick .mt{color:var(--burlap)}
+.draft-box{border:2px dashed var(--amber);border-radius:10px;padding:14px;margin-top:14px;background:rgba(217,142,50,.07)}
+.draft-box .dh{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--amber-deep);font-weight:800;margin-bottom:8px}
+.draft-box textarea{width:100%;min-height:110px;font:inherit;font-size:.9rem;border:1px solid var(--line);border-radius:6px;
+  padding:10px;background:var(--card);color:var(--bean);resize:vertical}
+.draft-box textarea[readonly]{border-color:transparent;background:transparent;resize:none}
+.draft-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.sent-note{margin-top:14px;font-weight:700;color:var(--amber-deep)}
+
+/* ============ CUSTOMERS ============ */
+.cust-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+@media(max-width:980px){.cust-grid{grid-template-columns:1fr}}
+.wl-row{padding:10px 0;border-bottom:1px dashed var(--line)}
+.wl-row:last-child{border-bottom:none}
+.wl-row .top{display:flex;justify-content:space-between;font-size:.88rem;font-weight:700}
+.wl-row details{margin-top:6px}
+.wl-row summary{font-size:.76rem;color:var(--bean-soft);cursor:pointer}
+.wave-preview{margin-top:8px;background:var(--paper-deep);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.82rem;max-width:340px}
+.wave-preview .from{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
+
+/* ============ MODAL / LABEL ============ */
+.overlay{position:fixed;inset:0;background:rgba(42,29,18,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:18px}
+.overlay.on{display:flex}
+.modal{background:var(--card);border-radius:12px;max-width:480px;width:100%;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.4);max-height:92vh;overflow:auto}
+.modal h3{font-family:var(--stencil);letter-spacing:.05em;margin-bottom:4px}
+.modal .mclose{float:right;background:none;border:none;font-size:1.3rem;color:var(--bean);line-height:1}
+.thermal{
+  background:#fff;border:1px solid #bbb;border-radius:4px;margin:16px auto;
+  width:300px;max-width:100%;padding:16px 18px;color:#111;
+  font-family:'Inter',sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.18);
+}
+.thermal .co{font-family:var(--stencil);font-size:1.05rem;letter-spacing:.1em;border-bottom:2.5px solid #111;padding-bottom:6px;margin-bottom:8px}
+.thermal .sk{font-weight:800;font-size:1rem}
+.thermal .rd{font-family:var(--stencil);font-size:1.15rem;margin:8px 0;border:2.5px solid #111;display:inline-block;padding:2px 10px;transform:rotate(-1deg)}
+.thermal .meta{font-size:.72rem;color:#333;display:flex;justify-content:space-between;margin:6px 0}
+.barcode{height:46px;margin-top:10px;
+  background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 5px,#111 5px 9px,transparent 9px 10px,#111 10px 11px,transparent 11px 15px,#111 15px 16px,transparent 16px 18px)}
+.barcode-num{font-size:.68rem;letter-spacing:.35em;text-align:center;margin-top:3px;color:#111}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="logo">DROP CONTROL</span>
+    <span class="sub">S&amp;W Craft Roasting</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Screens">
+    <button role="tab" data-tab="today" aria-selected="true">Today</button>
+    <button role="tab" data-tab="drops" aria-selected="false">Drop Manager</button>
+    <button role="tab" data-tab="brain" aria-selected="false">Roast Brain<span class="dot" id="dot-brain"></span></button>
+    <button role="tab" data-tab="ful" aria-selected="false">Fulfillment<span class="dot" id="dot-ful"></span></button>
+    <button role="tab" data-tab="inbox" aria-selected="false">Inbox Agent</button>
+    <button role="tab" data-tab="cust" aria-selected="false">Customers</button>
+  </nav>
+  <button id="resetBtn" title="Restore seed data">Reset demo</button>
+</header>
+
+<main>
+  <section class="panel active" id="panel-today" role="tabpanel" aria-label="Today"></section>
+  <section class="panel" id="panel-drops" role="tabpanel" aria-label="Drop Manager"></section>
+  <section class="panel" id="panel-brain" role="tabpanel" aria-label="Roast Brain"></section>
+  <section class="panel" id="panel-ful" role="tabpanel" aria-label="Fulfillment"></section>
+  <section class="panel" id="panel-inbox" role="tabpanel" aria-label="Inbox Agent"></section>
+  <section class="panel" id="panel-cust" role="tabpanel" aria-label="Customers and Waitlist"></section>
+</main>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="modalBox"></div>
+</div>
+
+<script>
+'use strict';
+/* =================================================================
+   DROP CONTROL — mock, single-file. All state lives in JS memory.
+   The four pure functions below are the contract that later becomes
+   the real Supabase/Inngest system. Everything else is demo chrome.
+   ================================================================= */
+
+// ---------- constants ----------
+const BATCH_YIELD = 21;     // one-lb bags per 12kg drum batch
+const DAY_CAP     = 24;     // max batches Nick can run in a day
+const GREEN_KG    = 12.0;   // green coffee charged per batch
+const BATCH_MIN   = 25;     // minutes per roast cycle incl. cooling
+const START_HOUR  = 8;      // first drop-in at 8:00am
+
+// ---------- deterministic RNG so the demo looks the same every load ----------
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+let rng = mulberry32(20260712);
+const pick = arr => arr[Math.floor(rng()*arr.length)];
+
+// ---------- dates ----------
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+function dateOf(i){ const d = new Date(TODAY); d.setDate(d.getDate()+i); return d; }
+function dLabel(i){ return dateOf(i).toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric'}); }
+function dShort(i){ return dateOf(i).toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
+function dLong(i){ return dateOf(i).toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'}); }
+function dStamp(i){ return dateOf(i).toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'}).toUpperCase(); }
+function batchTime(pos){ const m = START_HOUR*60 + pos*BATCH_MIN; const h=Math.floor(m/60), mm=m%60;
+  const ap = h>=12?'pm':'am'; const h12 = ((h+11)%12)+1; return `${h12}:${String(mm).padStart(2,'0')}${ap}`; }
+const money = n => '$' + n.toFixed(2);
+
+/* =================================================================
+   ==== PURE FUNCTION 1/4 — demandBySku(orders) ====
+   The single source of truth for demand. Sums ordered bags per SKU
+   across every non-refunded order (roasted or not — every ordered
+   bag consumed a batch slot). Orders are the INPUT of the system;
+   everything downstream derives from this map.
+   In production: a SQL view over the orders table.
+   ================================================================= */
+function demandBySku(orders){
+  const map = {};
+  for(const o of orders){
+    if(o.status === 'refunded') continue;
+    for(const it of o.items){ map[it.sku] = (map[it.sku]||0) + it.qty; }
+  }
+  return map;
+}
+
+/* =================================================================
+   ==== PURE FUNCTION 2/4 — batchesNeeded(bags) ====
+   Bags → batches at the drum's fixed yield. Always rounds UP:
+   a 22nd bag costs a whole second batch. This ceiling is why the
+   roast plan can be declared (and dated) in advance.
+   ================================================================= */
+function batchesNeeded(bags){
+  return Math.ceil(bags / BATCH_YIELD);
+}
+
+/* =================================================================
+   ==== PURE FUNCTION 3/4 — scheduleBatches(demand, existing, cap) ====
+   Diff scheduler: compares batches needed per SKU against batches
+   that already exist, and returns ONLY the new batches to append,
+   each assigned to the earliest roast day with a free slot (cap =
+   DAY_CAP). Append-only by design — batches already declared (and
+   possibly already printed on labels) are never silently deleted
+   or reshuffled; only explicit human moves change a declared day.
+   In production: an Inngest job triggered on order-write.
+   ================================================================= */
+function scheduleBatches(demand, existing, cap){
+  const perSkuHave = {}, perDayLoad = {};
+  for(const b of existing){
+    perSkuHave[b.sku] = (perSkuHave[b.sku]||0) + 1;
+    perDayLoad[b.day] = (perDayLoad[b.day]||0) + 1;
+  }
+  const fresh = [];
+  const firstFreeDay = () => { let d=0; while((perDayLoad[d]||0) >= cap) d++; return d; };
+  for(const sku of Object.keys(demand)){
+    const need = batchesNeeded(demand[sku]);
+    for(let i = (perSkuHave[sku]||0); i < need; i++){
+      const day = firstFreeDay();
+      fresh.push({ id:'B'+(++state.batchSeq), sku, day, status:'pending' });
+      perDayLoad[day] = (perDayLoad[day]||0) + 1;
+    }
+  }
+  return fresh;
+}
+
+/* =================================================================
+   ==== PURE FUNCTION 4/4 — reserveStock(stock, sku, qty) ====
+   The oversell killer. Check-and-decrement happens as ONE atomic
+   step against a single stock ledger — an order is either fully
+   reserved or fully rejected; there is no state in between, so
+   stock can never go negative no matter how fast orders arrive.
+   In production: a single Postgres UPDATE ... WHERE stock >= qty
+   RETURNING row (row-level lock = the atomicity).
+   ================================================================= */
+function reserveStock(stock, sku, qty){
+  if((stock[sku]||0) >= qty){
+    stock[sku] -= qty;
+    return { accepted:true, remaining: stock[sku] };
+  }
+  return { accepted:false, remaining: stock[sku]||0 };
+}
+
+// ---------- seed data ----------
+const SKUS = [
+  { id:'guji',    name:'Ethiopia Guji Natural',              short:'Guji Natural',   price:16.90, alloc:180, waitlist:351, seedBags:141 },
+  { id:'huehue',  name:'Guatemala Huehuetenango',            short:'Huehuetenango',  price:15.20, alloc:140, waitlist:203, seedBags:96  },
+  { id:'decaf',   name:'Colombia Popayan EA Decaf',          short:'Popayan Decaf',  price:14.80, alloc:100, waitlist:154, seedBags:74  },
+  { id:'arango',  name:'Colombia Arturo Arango El Paraiso',  short:'Arturo Arango',  price:15.62, alloc:160, waitlist:288, seedBags:118 },
+  { id:'camacho', name:'Colombia Camacho Rosado',            short:'Camacho',        price:17.35, alloc:240, waitlist:412, seedBags:236 },
+  { id:'pink',    name:'Colombia Pink Bourbon',              short:'Pink Bourbon',   price:18.10, alloc:120, waitlist:447, seedBags:89  },
+];
+const skuById = id => SKUS.find(s=>s.id===id);
+
+const FIRST = ['Sarah','Marcus','Jenna','Derek','Priya','Tom','Alicia','Ben','Chloe','Diego','Emma','Frank','Grace','Hector','Iris','Jamal','Katie','Liam','Maya','Noah','Olivia','Pete','Quinn','Rosa','Sam','Tara','Umar','Vera','Wes','Ximena','Yusuf','Zoe','Aaron','Bianca','Cal','Dana','Eli','Fiona','Gus','Hana','Leo','Nina','Owen','Ruth','Sean','Tess'];
+const LAST  = ['Mitchell','Tran','Okafor','Silva','Patel','Reyes','Kim','Novak','Larsen','Whitfield','Moreno','Chan','Dubois','Ellison','Foster','Grant','Hopkins','Ibarra','Jensen','Kowalski','Lopez','Mercer','Nash','Ortiz','Price','Romero','Stein','Turner','Vasquez','Ward'];
+const STREETS = ['Alder St','Birchwood Ave','Cedar Loop','Dockside Rd','Elm Ct','Foundry Ln','Grove St','Harbor Way','Juniper Dr','Klamath Ave','Larch St','Millpond Rd'];
+const CITIES = ['Sandpoint, ID','Coeur d\'Alene, ID','Spokane, WA','Missoula, MT','Boise, ID','Portland, OR','Seattle, WA','Bozeman, MT'];
+
+let state = null;
+let simTimer = null;
+
+function makeAddress(){
+  return `${100+Math.floor(rng()*899)} ${pick(STREETS)}, ${pick(CITIES)}`;
+}
+
+function seed(){
+  if(simTimer){ clearInterval(simTimer); simTimer = null; }
+  rng = mulberry32(20260712);
+  state = {
+    batchSeq: 0, orderSeq: 1000,
+    skus: SKUS, orders: [], batches: [],
+    customers: [], threads: [],
+    drop: {
+      name: dShort(6).replace(',','') + ' Drop',        // e.g. "Jul 18 Drop"
+      dateIdx: 6, status:'Scheduled', cap: 2,
+      stock: Object.fromEntries(SKUS.map(s=>[s.id, s.alloc])),
+      waves: [ {label:'Wave 1', size:200, at:'9:00am'},
+               {label:'Wave 2', size:200, at:'9:20am'},
+               {label:'Wave 3', size:'everyone else', at:'9:40am'} ],
+      attempted:0, accepted:0, oversells:0, capHits:0, soldOutTaps:0,
+      ran:false, running:false,
+    },
+    pastDrop: { name:'Jun 14 Drop', bags:880, sellout:'3h 12m', oversells:0 },
+    extraDrops: [],
+    postageBought:false,
+    downstream: null,          // set after a batch move
+    approvedReplies: 0,
+    ui: { tab:'today', threadSel:0 },
+  };
+
+  // ~40 named customers
+  const names = [];
+  for(let i=0;i<40;i++){
+    let n; do { n = pick(FIRST)+' '+pick(LAST); } while(names.includes(n));
+    names.push(n);
+  }
+  state.customers = names.map(n=>({
+    name:n, lifetime: 2+Math.floor(rng()*36),
+    lastOrderDays: Math.floor(rng()*30),
+    waitlists: SKUS.filter(()=>rng()<0.34).map(s=>s.id),
+    capHit: rng()<0.2,
+  }));
+
+  // ~250 open orders that exactly consume the seeded per-SKU demand
+  const remaining = Object.fromEntries(SKUS.map(s=>[s.id, s.seedBags]));
+  const stW = [['awaiting',.25],['roasted',.14],['labeled',.43],['shipped',.18]];
+  const pickStatus = ()=>{ let r=rng(),acc=0; for(const [s,w] of stW){acc+=w; if(r<acc) return s;} return 'awaiting'; };
+  while(Object.values(remaining).some(v=>v>0)){
+    const avail = SKUS.filter(s=>remaining[s.id]>0);
+    const nItems = (rng()<0.45 && avail.length>1) ? 2 : 1;
+    const items = [];
+    const chosen = [...avail].sort(()=>rng()-0.5).slice(0,nItems);
+    for(const s of chosen){
+      const q = Math.min(rng()<0.55?2:1, remaining[s.id]);
+      remaining[s.id] -= q;
+      items.push({sku:s.id, qty:q});
+    }
+    state.orders.push({
+      id:'ORD-'+(++state.orderSeq),
+      customer: pick(state.customers).name,
+      address: makeAddress(),
+      items, tier: rng()<0.7?'Ground':'Priority',
+      status: pickStatus(), source:'July restock',
+      hoursAgo: 2+Math.floor(rng()*70),
+      addrUpdated:false,
+    });
+  }
+
+  // materialize the roast plan from seeded demand
+  state.batches = [];
+  state.batches.push(...scheduleBatches(demandBySku(state.orders), state.batches, DAY_CAP));
+  // Nick already ran the first six batches this morning
+  state.batches.filter(b=>b.day===0).slice(0,6).forEach(b=>b.status='done');
+
+  seedThreads();
+  renderAll();
+}
+
+function seedThreads(){
+  const o = state.orders;
+  const grab = i => o[Math.min(i, o.length-1)];
+  const t = [];
+  const mk = (channel, tag, customer, inbound, draft, effect) =>
+    t.push({channel, tag, customer, inbound, draft, effect, status:'open', edited:false});
+
+  const oa = grab(7);  oa.customer = 'Sarah Mitchell'; oa.status = 'awaiting';
+  mk('email','Address Change','Sarah Mitchell',
+    `Hi! I just moved — can you ship my order (${oa.id}) to 412 Alder St, Sandpoint, ID instead? Sorry for the hassle!`,
+    `Hey Sarah — no hassle at all. I switched ${oa.id} to 412 Alder St in Sandpoint. It roasts this week and ships same day.\n\n-Nick at S&W`,
+    {type:'address', orderId:oa.id, newAddress:'412 Alder St, Sandpoint, ID'});
+
+  const ot = grab(19); ot.customer = 'Marcus Tran'; ot.status = 'awaiting';
+  mk('sms','Tracking','Marcus Tran',
+    `Hey any word on my beans? Ordered last week 👀`,
+    `Hey Marcus — your bag is on the sheet for this week's roast. Label's already printed with the roast date. Tracking hits your phone the second it ships.\n\n-Nick at S&W`,
+    {type:'none', orderId:ot.id});
+
+  mk('sms','Restock Question','Jenna Okafor',
+    `Is the Camacho ever coming back?? I missed the last drop and I'm devastated lol`,
+    `Ha — you and 411 other people. Camacho is in the ${state.drop.name} this Saturday. You're on the waitlist, so you'll get the Wave 1 text 20 minutes before anyone else. 2-bag cap so nobody gets scalped.\n\n-Nick at S&W`,
+    {type:'none'});
+
+  const orf = grab(31); orf.customer = 'Derek Silva'; orf.status = 'labeled';
+  mk('email','Refund','Derek Silva',
+    `Hi, I think I got charged twice for order ${orf.id}? Can you refund one of them.`,
+    `Derek — you're right, Square double-fired on your card. I refunded the duplicate just now; it lands back in 2–3 business days. Beans still ship on schedule. Sorry about that.\n\n-Nick at S&W`,
+    {type:'refund', orderId:orf.id});
+
+  mk('sms','Fan Mail','Priya Patel',
+    `That Guji Natural is the best coffee I've had in years. Blueberry city. Thank you!!`,
+    `Priya — that made my morning. The Guji lot this year is something special. There's more of it in Saturday's drop if you want to lock in a backup bag.\n\n-Nick at S&W`,
+    {type:'none'});
+
+  const oa2 = grab(45); oa2.customer = 'Tom Whitfield'; oa2.status = 'awaiting';
+  mk('email','Address Change','Tom Whitfield',
+    `Typo in my shipping address — should be Apt 4B not 4D. Order ${oa2.id}. Thanks!`,
+    `Tom — fixed. ${oa2.id} now reads Apt 4B. Caught it before the label run, so nothing else to do on your end.\n\n-Nick at S&W`,
+    {type:'address', orderId:oa2.id, newAddress:'(same street) Apt 4B'});
+
+  mk('sms','Tracking','Alicia Reyes',
+    `Ordered 2 bags as a gift — will they make it before Saturday?`,
+    `Alicia — they roast tomorrow and ship Priority right after, so they should land Thursday, Friday at the latest. I'll text you the tracking tonight.\n\n-Nick at S&W`,
+    {type:'none'});
+
+  mk('email','Restock Question','Ben Novak',
+    `Do you ever do a decaf subscription? My wife is hooked on the Popayan.`,
+    `Ben — not yet, but the Popayan EA is in every drop and decaf almost never sells out in the first wave. Join its waitlist and you'll basically never miss it. Subscription is on the list for this fall.\n\n-Nick at S&W`,
+    {type:'none'});
+
+  mk('sms','Fan Mail','Chloe Larsen',
+    `The hand-written roast date on the bag is such a nice touch 🥹`,
+    `Chloe — thanks! Small confession: as of this month the date is printed, not hand-written. Same promise though — nothing ships that wasn't roasted days, not weeks, ago.\n\n-Nick at S&W`,
+    {type:'none'});
+
+  state.threads = t;
+}
+
+// ---------- derived helpers ----------
+function batchesOfDay(d){ return state.batches.filter(b=>b.day===d); }
+function maxDay(){ return state.batches.reduce((m,b)=>Math.max(m,b.day),0); }
+function dayLoad(d){ return batchesOfDay(d).length; }
+function skuRoastDay(sku){ // last scheduled day for a SKU = its declared roast/ship gate
+  return state.batches.filter(b=>b.sku===sku).reduce((m,b)=>Math.max(m,b.day),0);
+}
+function orderShipDay(o){ return Math.max(...o.items.map(it=>skuRoastDay(it.sku))); }
+function labelableOrders(){ return state.orders.filter(o=>o.status!=='shipped' && o.status!=='refunded'); }
+function syncBatches(){
+  const fresh = scheduleBatches(demandBySku(state.orders), state.batches, DAY_CAP);
+  if(fresh.length) state.batches.push(...fresh);
+  return fresh.length;
+}
+
+// ---------- tiny DOM helpers ----------
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let toastT = null;
+function toast(msg){
+  $('.toast')?.remove();
+  const d = document.createElement('div'); d.className='toast'; d.textContent = msg;
+  document.body.appendChild(d);
+  clearTimeout(toastT); toastT = setTimeout(()=>d.remove(), 3400);
+}
+
+// ---------- tabs ----------
+$$('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    state.ui.tab = btn.dataset.tab;
+    $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected', b===btn ? 'true':'false'));
+    $$('section.panel').forEach(p=>p.classList.toggle('active', p.id === 'panel-'+btn.dataset.tab));
+    if(btn.dataset.tab==='brain') $('#dot-brain').classList.remove('on');
+    if(btn.dataset.tab==='ful')   $('#dot-ful').classList.remove('on');
+    renderTab(btn.dataset.tab);
+    window.scrollTo({top:0});
+  });
+});
+$('#resetBtn').addEventListener('click', ()=>{ seed(); toast('Demo reset — fresh sheet, fresh beans.'); });
+
+function renderTab(t){
+  ({today:renderToday, drops:renderDrops, brain:renderBrain, ful:renderFul, inbox:renderInbox, cust:renderCust})[t]();
+}
+function renderAll(){ ['today','drops','brain','ful','inbox','cust'].forEach(renderTab); }
+
+/* ============================================================
+   SCREEN 1 — TODAY (Nick's sheet)
+   ============================================================ */
+function renderToday(){
+  const q = batchesOfDay(0);
+  const done = q.filter(b=>b.status==='done').length;
+  const next = q.find(b=>b.status==='pending');
+  const nextIdx = next ? q.indexOf(next) : -1;
+  const pct = q.length ? Math.round(done/q.length*100) : 0;
+  const tmr = batchesOfDay(1);
+  const tmrBySku = {};
+  tmr.forEach(b=>tmrBySku[b.sku]=(tmrBySku[b.sku]||0)+1);
+
+  const hero = next ? `
+    <div class="hero-tag">
+      <div class="batchno">BATCH ${nextIdx+1} <span class="of">of ${q.length}</span></div>
+      <div class="sku-name">${esc(skuById(next.sku).name)}</div>
+      <div class="specs">
+        <span><b>${GREEN_KG.toFixed(1)} kg</b> green</span>
+        <span>drop into drum at <b>${batchTime(nextIdx)}</b></span>
+        <span>yields <b>${BATCH_YIELD} bags</b></span>
+      </div>
+      <button class="btn btn-primary" id="markDoneBtn">Mark Batch Done</button>
+    </div>` : `
+    <div class="hero-tag" style="text-align:center">
+      <div class="alldone">SHEET CLEARED.</div>
+      <p style="margin-top:8px;color:var(--bean-soft)">${q.length*BATCH_YIELD} bags roasted. Go home, Nick.</p>
+      <div class="stamp big">ROASTED</div>
+    </div>`;
+
+  $('#panel-today').innerHTML = `
+    <h1 class="screen">Today's Sheet</h1>
+    <p class="screen-sub">Roast what's on the sheet. Nothing else to figure out.</p>
+    <div class="today-grid">
+      <div>
+        <span class="roastdate-stamp">DECLARED ROAST DATE · ${dStamp(0)}</span>
+        ${hero}
+        <div class="tally">
+          <div class="block"><small>Batches</small><span class="stat-num">${done} / ${q.length}</span></div>
+          <div class="block"><small>Bags roasted</small><span class="stat-num">${done*BATCH_YIELD} / ${q.length*BATCH_YIELD}</span></div>
+          <div class="tally-meter"><div class="meter" aria-label="Day progress ${pct}%"><i style="width:${pct}%"></i></div>
+            <div class="ghost" style="margin-top:4px">${pct}% of the day done</div></div>
+        </div>
+        <div class="queue-row" aria-label="Batch queue">
+          ${q.map((b,i)=>`
+            <div class="tag-card ${b.status==='done'?'done':''} ${b===next?'next':''}">
+              <div class="n">#${i+1}</div>
+              <div class="s">${esc(skuById(b.sku).short)}</div>
+              <div class="t">${batchTime(i)} · ${GREEN_KG.toFixed(1)}kg</div>
+              ${b.status==='done'?'<span class="stamp">ROASTED</span>':''}
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="rail">
+        <div class="card">
+          <h3>Tomorrow — ${dLabel(1)}</h3>
+          <ul>
+            ${Object.keys(tmrBySku).map(s=>`<li><span>${esc(skuById(s).short)}</span><b>${tmrBySku[s]} batch${tmrBySku[s]>1?'es':''}</b></li>`).join('') || '<li><span>Nothing scheduled yet</span></li>'}
+            <li><span>Total bags</span><b>${tmr.length*BATCH_YIELD}</b></li>
+            <li><span>Green to stage tonight</span><b>${(tmr.length*GREEN_KG).toFixed(0)} kg</b></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Why the date's already printed</h3>
+          <p style="font-size:.85rem;color:var(--bean-soft)">Every label for today's orders was pre-printed with <b>${dStamp(0)}</b> — because the sheet declared this roast day before the beans hit the drum. No Sharpie. No guessing.</p>
+        </div>
+      </div>
+    </div>`;
+
+  $('#markDoneBtn')?.addEventListener('click', ()=>{
+    if(!next) return;
+    next.status = 'done';
+    // ripple: this SKU's oldest awaiting orders flip to Roasted (a batch = 21 bags of cover)
+    let cover = BATCH_YIELD;
+    for(const o of state.orders){
+      if(cover<=0) break;
+      if(o.status==='awaiting' && o.items.some(it=>it.sku===next.sku)){
+        o.status='roasted';
+        cover -= o.items.filter(it=>it.sku===next.sku).reduce((a,it)=>a+it.qty,0);
+      }
+    }
+    renderToday();
+    toast(`Batch ${nextIdx+1} stamped ROASTED — ${skuById(next.sku).short}. Orders moved to “Roasted.”`);
+    const fresh = $$('#panel-today .tag-card.done .stamp')[done]; // newly stamped tag
+    fresh?.classList.add('fresh');
+  });
+}
+
+/* ============================================================
+   SCREEN 2 — DROP MANAGER (with the money-shot simulation)
+   ============================================================ */
+function renderDrops(){
+  const d = state.drop;
+  const soldOutAll = Object.values(d.stock).every(v=>v===0);
+  const statusChip = soldOutAll ? '<span class="chip soldout">SOLD OUT</span>'
+                   : d.running ? '<span class="chip roasted">LIVE</span>'
+                   : `<span class="chip awaiting">${d.status}</span>`;
+
+  $('#panel-drops').innerHTML = `
+    <h1 class="screen">Drop Manager</h1>
+    <p class="screen-sub">Announce on your terms. Sell every bag. Oversell none.</p>
+    <div class="drops-grid">
+      <div class="card">
+        <div class="drop-head">
+          <h2>${esc(d.name)} — ${dLabel(d.dateIdx)}</h2>
+          ${statusChip}
+        </div>
+        <div style="font-size:.85rem;color:var(--bean-soft)">Per-customer cap: <b>${d.cap} bags per SKU</b> · Announcement waves:</div>
+        <div class="wave-list">
+          ${d.waves.map(w=>`<span><b>${w.label}</b> — ${typeof w.size==='number'? w.size+' waitlist members':w.size} at ${w.at}</span>`).join('')}
+        </div>
+        <div id="invRows">
+          ${SKUS.map(s=>{
+            const rem = d.stock[s.id], pctLeft = Math.round(rem/s.alloc*100);
+            return `<div class="inv-row">
+              <span class="nm">${esc(s.short)} <span class="ghost">${money(s.price)}</span></span>
+              <div class="meter drain" aria-label="${rem} of ${s.alloc} left"><i data-sku="${s.id}" style="width:${pctLeft}%"></i></div>
+              <span class="ct" data-skuct="${s.id}">${rem===0?'<span class="chip soldout">SOLD OUT</span>':`${rem} / ${s.alloc} left`}</span>
+            </div>`;}).join('')}
+        </div>
+        <div class="sim-counters">
+          <div class="block"><small>Orders attempted</small><span class="stat-num" id="cAtt">${d.attempted}</span></div>
+          <div class="block"><small>Orders accepted</small><span class="stat-num" id="cAcc">${d.accepted}</span></div>
+          <div class="block oversell"><small>Oversells</small><span class="stat-num" id="cOver">${d.oversells}</span></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-primary" id="simBtn" ${d.running||soldOutAll?'disabled':''}>
+            ${d.running?'Simulating…': soldOutAll?'Drop complete':'Simulate Drop'}</button>
+          <span class="ghost">30-second replay of drop morning, at real stampede speed.</span>
+        </div>
+        <ul id="ticker" aria-live="off" style="margin-top:14px">${d.ran||d.running?'':'<li class="rej">Order feed appears here when the drop goes live…</li>'}</ul>
+        <div class="sim-banner" id="simBanner" style="display:${soldOutAll&&!d.running?'block':'none'}">
+          All gone — <b>0 oversold</b>. ${d.accepted} orders accepted, ${d.capHits} cap-limit saves, ${d.soldOutTaps} sold-out taps turned away politely.
+          The Roast Brain already rebuilt next week's sheet.
+        </div>
+      </div>
+      <div>
+        <div class="card drop-done" style="margin-bottom:14px">
+          <div class="drop-head"><h2>${esc(state.pastDrop.name)}</h2><span class="chip shipped">Complete</span></div>
+          <p style="font-size:.88rem;color:var(--bean-soft)">${state.pastDrop.bags} bags · sold out in <b>${state.pastDrop.sellout}</b> · <b style="color:var(--amber-deep)">${state.pastDrop.oversells} oversells</b> · all shipped</p>
+        </div>
+        ${state.extraDrops.map(x=>`
+          <div class="card" style="margin-bottom:14px">
+            <div class="drop-head"><h2>${esc(x.name)}</h2><span class="chip awaiting">Draft</span></div>
+            <p style="font-size:.85rem;color:var(--bean-soft)">${x.date||'no date yet'} · cap ${x.cap}/SKU · ${x.skus.length} SKUs</p>
+          </div>`).join('')}
+        <div class="card">
+          <details class="newdrop">
+            <summary>+ New drop</summary>
+            <form id="newDropForm">
+              <input type="text" name="nm" placeholder="Drop name (e.g. Aug 1 Drop)" required>
+              <input type="date" name="dt">
+              <label style="font-size:.8rem">Per-customer cap <input type="number" name="cap" value="2" min="1" max="6" style="width:64px"></label>
+              <div class="sku-checks">${SKUS.map(s=>`<label><input type="checkbox" name="sku" value="${s.id}" checked>${esc(s.short)}</label>`).join('')}</div>
+              <button class="btn btn-quiet" type="submit">Save draft</button>
+            </form>
+          </details>
+        </div>
+      </div>
+    </div>`;
+
+  $('#simBtn')?.addEventListener('click', startSim);
+  $('#newDropForm')?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    state.extraDrops.push({ name:f.get('nm'), date:f.get('dt'), cap:f.get('cap'),
+      skus:f.getAll('sku') });
+    renderDrops();
+    toast('Draft drop saved. Waves and inventory get set when you schedule it.');
+  });
+}
+
+// ---- the simulation: 30 seconds, ~850 attempts, zero oversells ----
+function startSim(){
+  const d = state.drop;
+  if(d.running) return;
+  d.running = true; d.ran = true;
+  renderDrops();
+  const ticker = $('#ticker'); ticker.innerHTML = '';
+  const simCaps = {};          // "name|sku" -> bags already bought (enforces the 2-bag cap)
+  const t0 = performance.now();
+  const DURATION = 30000, TICK = 150;
+  let firstAccept = true;
+
+  const feed = (html, cls='') => {
+    const li = document.createElement('li'); if(cls) li.className = cls;
+    li.innerHTML = html;
+    ticker.prepend(li);
+    while(ticker.children.length > 9) ticker.lastChild.remove();
+  };
+
+  simTimer = setInterval(()=>{
+    const el = performance.now() - t0;
+    const wave = el < 10000 ? 'Wave 1' : el < 20000 ? 'Wave 2' : 'Wave 3';
+    // ~4.2 attempts per tick ≈ 847 over 30s
+    let n = 3 + (Math.random()<0.7?1:0) + (Math.random()<0.5?1:0);
+    while(n--){
+      d.attempted++;
+      const name = firstAccept ? 'Sarah M.' :
+        FIRST[Math.floor(Math.random()*FIRST.length)]+' '+LAST[Math.floor(Math.random()*LAST.length)][0]+'.';
+      // buyers pile onto whatever still shows in stock (weighted by remaining);
+      // ~20% still tap a sold-out SKU and get politely turned away
+      const inStock = SKUS.filter(s=>d.stock[s.id]>0);
+      let sku, qty;
+      if(inStock.length && Math.random()<0.8){
+        const tot = inStock.reduce((a,s)=>a+d.stock[s.id],0);
+        let r = Math.random()*tot;
+        sku = inStock.find(s=>(r-=d.stock[s.id])<0) || inStock[0];
+        qty = Math.min(firstAccept?2:(Math.random()<0.55?2:1), d.stock[sku.id]);
+      } else {
+        sku = SKUS[Math.floor(Math.random()*SKUS.length)];
+        qty = Math.random()<0.55?2:1;
+      }
+      const capKey = name+'|'+sku.id, had = simCaps[capKey]||0;
+      if(had + qty > d.cap){ d.capHits++; feed(`${esc(name)} — ${qty}× ${esc(sku.short)} — <b>cap hit (${d.cap}/SKU)</b>`, 'rej'); continue; }
+      const res = reserveStock(d.stock, sku.id, qty);   // ← the atomic moment
+      if(res.accepted){
+        d.accepted++; simCaps[capKey] = had + qty;
+        state.orders.push({ id:'ORD-'+(++state.orderSeq), customer:name, address:makeAddress(),
+          items:[{sku:sku.id, qty}], tier: Math.random()<0.7?'Ground':'Priority',
+          status:'awaiting', source:d.name, hoursAgo:0, addrUpdated:false });
+        feed(`<b>${esc(name)}</b> — ${qty}× ${esc(sku.short)} — ${wave}`);
+        if(res.remaining===0) feed(`<b>${esc(sku.short)} SOLD OUT</b> — button off, zero oversold`, 'rej');
+        firstAccept = false;
+      } else {
+        d.soldOutTaps++;
+        feed(`${esc(name)} — ${esc(sku.short)} — <b>sold out</b>, turned away`, 'rej');
+      }
+    }
+    // live gauges
+    $('#cAtt').textContent = d.attempted;
+    $('#cAcc').textContent = d.accepted;
+    $('#cOver').textContent = d.oversells; // structurally always 0 — reserveStock is atomic
+    for(const s of SKUS){
+      const bar = document.querySelector(`#invRows i[data-sku="${s.id}"]`);
+      const ct  = document.querySelector(`#invRows [data-skuct="${s.id}"]`);
+      if(bar) bar.style.width = (d.stock[s.id]/s.alloc*100)+'%';
+      if(ct) ct.innerHTML = d.stock[s.id]===0 ? '<span class="chip soldout">SOLD OUT</span>' : `${d.stock[s.id]} / ${s.alloc} left`;
+    }
+    // demand → roast plan, live
+    if(syncBatches() > 0){ $('#dot-brain').classList.add('on'); $('#dot-ful').classList.add('on'); }
+
+    // closing rush: whatever straggles past the 30s mark gets bought out by Wave 3
+    if(el >= DURATION){
+      for(const s of SKUS){
+        while(d.stock[s.id] > 0){
+          const q = Math.min(2, d.stock[s.id]);
+          d.attempted++;
+          if(reserveStock(d.stock, s.id, q).accepted){
+            d.accepted++;
+            state.orders.push({ id:'ORD-'+(++state.orderSeq), customer:FIRST[Math.floor(Math.random()*FIRST.length)]+' '+LAST[Math.floor(Math.random()*LAST.length)][0]+'.',
+              address:makeAddress(), items:[{sku:s.id, qty:q}], tier: Math.random()<0.7?'Ground':'Priority',
+              status:'awaiting', source:d.name, hoursAgo:0, addrUpdated:false });
+          }
+        }
+      }
+    }
+    // NOTE: the sim runs the full 30s even after sellout — watching orders keep
+    // hammering a sold-out drop with zero oversells IS the demo.
+    if(el >= DURATION){
+      clearInterval(simTimer); simTimer = null;
+      d.running = false;
+      if(Object.values(d.stock).every(v=>v===0)) d.status = 'Sold Out';
+      syncBatches();
+      renderDrops();
+      const banner = $('#simBanner');
+      banner.style.display = 'block';
+      banner.innerHTML = `All gone — <b>0 oversold</b>. <b>${d.accepted}</b> orders accepted of ${d.attempted} attempted
+        (${d.capHits} cap saves, ${d.soldOutTaps} sold-out taps). The Roast Brain scheduled
+        <b>${state.batches.length} total batches</b> across ${maxDay()+1} roast days — labels and pick lists already re-counted.`;
+    }
+  }, TICK);
+}
+
+/* ============================================================
+   SCREEN 3 — ROAST BRAIN (weekly schedule)
+   ============================================================ */
+let moveOpenFor = null; // batch id whose move-menu is open
+
+function renderBrain(){
+  const demand = demandBySku(state.orders);
+  const days = Math.max(6, maxDay()) + 1;
+
+  const mathLines = SKUS.filter(s=>demand[s.id]).map(s=>{
+    const bags = demand[s.id], n = batchesNeeded(bags);
+    const ds = [...new Set(state.batches.filter(b=>b.sku===s.id).map(b=>b.day))].sort((a,b)=>a-b);
+    return `<div class="ln"><b>${esc(s.short)}</b>: ${bags} bags ordered ÷ ${BATCH_YIELD} per batch = <b>${n} batches</b>
+      <span class="arrow">→</span> ${ds.map(dLabel).join(' + ')}</div>`;
+  }).join('');
+
+  const cols = [];
+  for(let day=0; day<days; day++){
+    const bs = batchesOfDay(day), load = bs.length;
+    cols.push(`
+      <div class="day-col ${day===0?'today-col':''}" data-day="${day}">
+        <h4>${day===0?'TODAY — ':''}${dLabel(day)}</h4>
+        <div class="cap ${load>=DAY_CAP?'full':''}">${load} / ${DAY_CAP} batch slots${load>=DAY_CAP?' — full':''}</div>
+        ${bs.map(b=>{
+          const done = b.status==='done';
+          return `<button class="bchip ${done?'done-chip':''}" data-bid="${b.id}" ${done?'disabled':'draggable="true"'}
+            aria-label="${skuById(b.sku).short} batch, ${done?'roasted':'click to move'}">
+            <span class="bn">${b.id.replace('B','#')}</span>${esc(skuById(b.sku).short)}</button>
+          ${moveOpenFor===b.id ? moveMenuHTML(b, days) : ''}`;
+        }).join('')}
+      </div>`);
+  }
+
+  const dn = state.downstream;
+  $('#panel-brain').innerHTML = `
+    <h1 class="screen">Roast Brain</h1>
+    <p class="screen-sub">Orders are the input. This sheet is the output. Drag a batch — or tap it — to move its day; everything downstream follows.</p>
+    <div class="card math-lines">
+      <div style="font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px">The arithmetic (nothing hidden)</div>
+      ${mathLines}
+    </div>
+    <div class="week-scroll"><div class="week">${cols.join('')}</div></div>
+    <div class="downstream ${dn?'on':''}" role="status">
+      ${dn ? `<b>Batch moved → downstream rebuilt:</b> ${dn.labels} labels re-dated to ${dn.newDate} ·
+        pick lists for ${dn.sku} rebuilt · ${dn.emails} customer ship-date emails queued.
+        <span class="chip updated">Fulfillment updated</span>` : ''}
+    </div>`;
+
+  // drag & drop
+  $$('#panel-brain .bchip[draggable="true"]').forEach(chip=>{
+    chip.addEventListener('dragstart', e=>{
+      e.dataTransfer.setData('text/plain', chip.dataset.bid);
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', ()=>chip.classList.remove('dragging'));
+    chip.addEventListener('click', ()=>{ // click-to-move (mobile & keyboard path)
+      moveOpenFor = moveOpenFor===chip.dataset.bid ? null : chip.dataset.bid;
+      renderBrain();
+    });
+  });
+  $$('#panel-brain .day-col').forEach(col=>{
+    col.addEventListener('dragover', e=>{ e.preventDefault(); col.classList.add('dragover'); });
+    col.addEventListener('dragleave', ()=>col.classList.remove('dragover'));
+    col.addEventListener('drop', e=>{
+      e.preventDefault(); col.classList.remove('dragover');
+      moveBatch(e.dataTransfer.getData('text/plain'), +col.dataset.day);
+    });
+  });
+  $$('#panel-brain .move-menu button[data-mv]').forEach(b=>{
+    b.addEventListener('click', ()=>moveBatch(b.dataset.bid, +b.dataset.mv));
+  });
+}
+
+function moveMenuHTML(batch, days){
+  let opts = '';
+  for(let day=0; day<days; day++){
+    if(day===batch.day) continue;
+    const full = dayLoad(day) >= DAY_CAP;
+    opts += `<button data-mv="${day}" data-bid="${batch.id}" ${full?'disabled':''}>${dLabel(day)} — ${dayLoad(day)}/${DAY_CAP}${full?' (full)':''}</button>`;
+  }
+  return `<div class="move-menu"><p>Move ${batch.id.replace('B','#')} · ${esc(skuById(batch.sku).short)} to:</p>${opts}</div>`;
+}
+
+function moveBatch(bid, day){
+  const b = state.batches.find(x=>x.id===bid);
+  if(!b || b.status==='done' || b.day===day) { moveOpenFor=null; renderBrain(); return; }
+  if(dayLoad(day) >= DAY_CAP){ toast(`${dLabel(day)} is full — ${DAY_CAP} batches max.`); return; }
+  b.day = day;
+  moveOpenFor = null;
+  const touched = state.orders.filter(o=>o.status!=='shipped' && o.status!=='refunded' && o.items.some(it=>it.sku===b.sku));
+  state.downstream = { sku: skuById(b.sku).short, labels: touched.length, emails: touched.length, newDate: dLabel(day) };
+  $('#dot-ful').classList.add('on');
+  renderBrain();
+  toast(`${b.id.replace('B','#')} ${skuById(b.sku).short} → ${dLabel(day)}. Labels, pick lists, ship-date emails: rebuilt.`);
+}
+
+/* ============================================================
+   SCREEN 4 — FULFILLMENT
+   ============================================================ */
+function renderFul(){
+  const all = labelableOrders();
+  const packed = state.orders.filter(o=>o.status==='labeled'||o.status==='shipped').length;
+  const packPct = state.orders.length ? Math.round(packed/state.orders.length*100) : 0;
+  const postage = all.reduce((a,o)=>a + (o.tier==='Priority'?1.55:1.15), 0);
+
+  // group open orders by ship day, then list per-SKU bag subtotals
+  const groups = {};
+  for(const o of all){ const d = orderShipDay(o); (groups[d] ||= []).push(o); }
+  const dayKeys = Object.keys(groups).map(Number).sort((a,b)=>a-b);
+
+  const dn = state.downstream;
+  $('#panel-ful').innerHTML = `
+    <h1 class="screen">Fulfillment</h1>
+    <p class="screen-sub">Pick lists in roast order. Labels already carry the declared roast date.</p>
+    <div class="card" style="margin-bottom:18px">
+      <div class="ful-top">
+        <div class="pack-progress">
+          <div class="lbl"><span><b>Day 1 of 1.5</b> — ${packPct}% packed</span><span class="ghost">old way: day 2 of 4</span></div>
+          <div class="meter" aria-label="${packPct}% packed"><i style="width:${packPct}%"></i></div>
+        </div>
+        <button class="btn btn-primary" id="printLabels">Print All Labels (${all.length}) ${dn?'<span class="chip updated">Updated</span>':''}</button>
+        <button class="btn btn-quiet" id="buyPostage" ${state.postageBought?'disabled':''}>
+          ${state.postageBought ? 'Postage purchased ✓' : `Buy Postage — ${money(postage)} (${all.length} pkgs)`}</button>
+      </div>
+    </div>
+    ${dayKeys.map(d=>{
+      const os = groups[d];
+      const bySku = {};
+      os.forEach(o=>o.items.forEach(it=>bySku[it.sku]=(bySku[it.sku]||0)+it.qty));
+      // orders with a fresh address change float to the top of their pick list
+      const shown = [...os].sort((a,b)=>(b.addrUpdated?1:0)-(a.addrUpdated?1:0)).slice(0,10);
+      return `<div class="card pick-group">
+        <h3>Roast day ${dLabel(d)}${d===0?' — today':''}</h3>
+        <div class="sub">${os.length} orders · ${Object.entries(bySku).map(([s,n])=>`${esc(skuById(s).short)} × ${n}`).join(' · ')}</div>
+        <div class="table-wrap"><table class="orders">
+          <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Ship</th><th>Status</th></tr></thead>
+          <tbody>
+          ${shown.map(o=>`<tr>
+            <td>${o.id}</td>
+            <td>${esc(o.customer)}${o.addrUpdated?`<span class="addr-note">✓ address updated → ${esc(o.address)}</span>`:''}</td>
+            <td>${o.items.map(it=>`${it.qty}× ${esc(skuById(it.sku).short)}`).join(', ')}</td>
+            <td>${o.tier}</td>
+            <td><span class="chip ${o.status}">${{awaiting:'Awaiting Roast',roasted:'Roasted',labeled:'Labeled',shipped:'Shipped',refunded:'Refunded'}[o.status]}</span></td>
+          </tr>`).join('')}
+          </tbody>
+        </table></div>
+        ${os.length>shown.length?`<div class="more-row">+ ${os.length-shown.length} more orders in this pick list</div>`:''}
+      </div>`;
+    }).join('')}`;
+
+  $('#printLabels').addEventListener('click', ()=>{
+    state.downstream = null;
+    openLabelModal(all.length);
+  });
+  $('#buyPostage').addEventListener('click', ()=>{
+    state.postageBought = true;
+    renderFul();
+    toast(`Postage bought for ${all.length} packages — ${money(postage)}. Scan forms sent to the printer.`);
+  });
+}
+
+function openLabelModal(count){
+  const firstPending = state.batches.find(b=>b.status==='pending') || state.batches[0];
+  const sku = skuById(firstPending.sku);
+  const day = skuRoastDay(sku.id);
+  const lot = `SW-${String(dateOf(day).getMonth()+1).padStart(2,'0')}${String(dateOf(day).getDate()).padStart(2,'0')}-${sku.id.slice(0,3).toUpperCase()}`;
+  openModal(`
+    <button class="mclose" aria-label="Close">×</button>
+    <h3 id="modalTitle">Label preview — 1 of ${count}</h3>
+    <p style="font-size:.85rem;color:var(--bean-soft)">Thermal 4×6, roast date pre-printed from the declared schedule. The other ${count-1} queue behind it.</p>
+    <div class="thermal">
+      <div class="co">S&amp;W CRAFT ROASTING</div>
+      <div class="sk">${esc(sku.name)}</div>
+      <div style="font-size:.72rem;color:#333">whole bean · light roast · single origin</div>
+      <div class="rd">ROAST DATE ${dStamp(day)}</div>
+      <div class="meta"><span>NET WT 1 LB (454 g)</span><span>LOT ${lot}</span></div>
+      <div class="barcode" role="img" aria-label="barcode"></div>
+      <div class="barcode-num">8 4012 ${String(1000+day)} ${sku.id.length}7</div>
+    </div>
+    <div style="text-align:right"><button class="btn btn-primary" id="sendPrint">Send ${count} to printer</button></div>`);
+  $('#sendPrint').addEventListener('click', ()=>{ closeModal(); renderFul(); toast(`${count} labels queued to the thermal printer. Roast dates locked.`); });
+}
+
+function openModal(html){
+  $('#modalBox').innerHTML = html;
+  $('#overlay').classList.add('on');
+  $('#overlay').setAttribute('aria-hidden','false');
+  $('#modalBox .mclose')?.addEventListener('click', closeModal);
+  $('#modalBox .mclose')?.focus();
+}
+function closeModal(){ $('#overlay').classList.remove('on'); $('#overlay').setAttribute('aria-hidden','true'); }
+$('#overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); if(moveOpenFor){moveOpenFor=null; renderBrain();} } });
+
+/* ============================================================
+   SCREEN 5 — INBOX AGENT (CRM)
+   ============================================================ */
+function renderInbox(){
+  const sel = Math.min(state.ui.threadSel, state.threads.length-1);
+  const t = state.threads[sel];
+  const openCount = state.threads.filter(x=>x.status==='open').length;
+
+  $('#panel-inbox').innerHTML = `
+    <h1 class="screen">Inbox Agent</h1>
+    <p class="screen-sub">Every message answered in your voice. You just say yes.</p>
+    <div class="inbox-stat"><b>23 replies drafted</b> — 4 min of Nick's time vs 1.9 hrs manual · ${state.approvedReplies} approved this session · ${openCount} waiting</div>
+    <div class="inbox-grid">
+      <div class="card" style="padding:6px 0">
+        <ul class="thread-list">
+          ${state.threads.map((th,i)=>`<li><button class="${i===sel?'sel':''}" data-th="${i}">
+            <span class="who"><span>${esc(th.customer)}</span><span class="tagchip ${th.tag==='Refund'?'t-refund':th.tag==='Address Change'?'t-address':''}">${th.tag}</span></span>
+            <span class="prev">${th.status==='sent'?'✓ replied — ':th.status==='skipped'?'(skipped) ':''}${esc(th.inbound)}</span>
+            <span class="chan">${th.channel.toUpperCase()}</span>
+          </button></li>`).join('')}
+        </ul>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          <b>${esc(t.customer)}</b>
+          <span><span class="tagchip ${t.tag==='Refund'?'t-refund':t.tag==='Address Change'?'t-address':''}">${t.tag}</span>
+          <span class="chan"> · via ${t.channel.toUpperCase()}</span></span>
+        </div>
+        <div class="msg them">${esc(t.inbound)}<span class="mt">${t.channel==='sms'?'Text':'Email'} · this morning</span></div>
+        ${t.status==='sent' ? `
+          <div class="msg nick">${esc(t.finalText||t.draft).replace(/\n/g,'<br>')}<span class="mt">Sent by Inbox Agent · approved by Nick</span></div>
+          <p class="sent-note">✓ Sent${t.effect.type==='address'?' — order updated in Fulfillment':''}${t.effect.type==='refund'?' — refund issued, order marked':''}</p>`
+        : t.status==='skipped' ? `<p class="ghost" style="margin-top:12px">Skipped — left in the queue for later.</p>
+          <div class="draft-actions"><button class="btn btn-quiet" id="unskipBtn">Reopen draft</button></div>`
+        : `
+          <div class="draft-box">
+            <div class="dh">AI draft — Nick's voice</div>
+            <textarea id="draftText" ${t.edited?'':'readonly'} aria-label="Draft reply">${esc(t.draft)}</textarea>
+            <div class="draft-actions">
+              <button class="btn btn-primary" id="approveBtn">Approve &amp; send</button>
+              <button class="btn btn-quiet" id="editBtn">${t.edited?'Editing…':'Edit'}</button>
+              <button class="btn btn-quiet" id="skipBtn">Skip</button>
+            </div>
+            ${t.effect.type==='address'?`<p class="ghost" style="margin-top:8px">Approving also updates ${t.effect.orderId} to the new address.</p>`:''}
+            ${t.effect.type==='refund'?`<p class="ghost" style="margin-top:8px">Approving also refunds ${t.effect.orderId} in Square.</p>`:''}
+          </div>`}
+      </div>
+    </div>`;
+
+  $$('#panel-inbox [data-th]').forEach(b=>b.addEventListener('click', ()=>{ state.ui.threadSel = +b.dataset.th; renderInbox(); }));
+  $('#approveBtn')?.addEventListener('click', ()=>{
+    t.finalText = $('#draftText').value;
+    t.status = 'sent';
+    state.approvedReplies++;
+    applyEffect(t.effect);
+    renderInbox();
+  });
+  $('#editBtn')?.addEventListener('click', ()=>{
+    t.edited = true; renderInbox();
+    const ta = $('#draftText'); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+  });
+  $('#skipBtn')?.addEventListener('click', ()=>{
+    t.status='skipped';
+    const nxt = state.threads.findIndex(x=>x.status==='open');
+    if(nxt>=0) state.ui.threadSel = nxt;
+    renderInbox();
+  });
+  $('#unskipBtn')?.addEventListener('click', ()=>{ t.status='open'; renderInbox(); });
+}
+
+function applyEffect(eff){
+  if(eff.type==='address'){
+    const o = state.orders.find(x=>x.id===eff.orderId);
+    if(o){ o.address = eff.newAddress; o.addrUpdated = true; }
+    $('#dot-ful').classList.add('on');
+    toast(`Reply sent. ${eff.orderId} re-addressed — pick list and label updated in Fulfillment.`);
+  } else if(eff.type==='refund'){
+    const o = state.orders.find(x=>x.id===eff.orderId);
+    if(o) o.status = 'refunded';
+    $('#dot-ful').classList.add('on');
+    toast(`Reply sent. ${eff.orderId} refunded — pulled from the pick list.`);
+  } else {
+    toast('Reply sent in Nick\'s voice. Next.');
+  }
+}
+
+/* ============================================================
+   SCREEN 6 — CUSTOMERS & WAITLIST
+   ============================================================ */
+function renderCust(){
+  $('#panel-cust').innerHTML = `
+    <h1 class="screen">Customers &amp; Waitlist</h1>
+    <p class="screen-sub">Who buys, who's waiting, who hit the cap.</p>
+    <div class="cust-grid">
+      <div class="card">
+        <div class="table-wrap"><table class="orders">
+          <thead><tr><th>Customer</th><th>Lifetime bags</th><th>Last order</th><th>Waitlists</th><th>Cap status</th></tr></thead>
+          <tbody>
+            ${state.customers.map(c=>`<tr>
+              <td><b>${esc(c.name)}</b></td>
+              <td>${c.lifetime}</td>
+              <td>${c.lastOrderDays===0?'today':c.lastOrderDays+'d ago'}</td>
+              <td style="font-size:.78rem">${c.waitlists.map(w=>esc(skuById(w).short)).join(', ')||'—'}</td>
+              <td>${c.capHit?`<span class="chip awaiting">hit ${state.drop.cap}-bag cap — ${esc(state.pastDrop.name)}</span>`:'<span class="ghost">under cap</span>'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--stencil);letter-spacing:.06em;margin-bottom:6px">WAITLISTS</h3>
+        <p class="ghost" style="margin-bottom:8px">Wave texts go out 20 minutes apart — no stampede, no crash.</p>
+        ${SKUS.map(s=>`
+          <div class="wl-row">
+            <div class="top"><span>${esc(s.short)}</span><span>${s.waitlist} people</span></div>
+            <details>
+              <summary>Preview Wave 1 text</summary>
+              <div class="wave-preview">
+                <div class="from">SMS · from S&amp;W Craft Roasting</div>
+                S&amp;W: <b>${esc(s.short)}</b> drops ${dLabel(state.drop.dateIdx)} at 9:00am.
+                You're in <b>Wave 1</b> (first 200 on the list) — your link goes live 20 min before everyone else.
+                ${state.drop.cap}-bag cap so nobody gets scalped. Reply STOP to leave the list.
+              </div>
+            </details>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ---------- boot ----------
+seed();
+</script>
+</body>
+</html>
