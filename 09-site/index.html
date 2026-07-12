@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ogami Systems</title>
+<meta name="description" content="Custom software for owner-operated businesses. Orders in, busywork out.">
+<style>
+:root{
+  --ink:#241811;
+  --paper:#EFE6D8;
+  --tan:#C9B393;
+  --amber:#D98E32;
+  --line:rgba(239,230,216,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100svh;
+  display:flex;flex-direction:column;
+  background:var(--ink);
+  background-image:radial-gradient(rgba(239,230,216,.04) 1px, transparent 1.4px);
+  background-size:28px 28px;
+  color:var(--paper);
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.card{max-width:560px}
+.mark{
+  font-size:.78rem;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin-bottom:26px;
+}
+h1{
+  font-size:clamp(1.9rem,5.5vw,2.9rem);
+  font-weight:800;letter-spacing:-.015em;line-height:1.16;
+  text-wrap:balance;margin-bottom:18px;
+}
+h1 em{font-style:normal;color:var(--amber)}
+.lede{color:var(--tan);font-size:1.02rem;max-width:46ch;margin-bottom:34px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-block;text-decoration:none;font-weight:700;font-size:.92rem;
+  background:var(--amber);color:#241811;padding:13px 26px;border-radius:8px;
+  transition:transform .1s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible{outline:3px solid var(--paper);outline-offset:3px}
+.quiet{color:var(--tan);font-size:.85rem}
+footer{
+  border-top:1px solid var(--line);
+  padding:18px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  font-size:.75rem;color:rgba(201,179,147,.7);
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="mark">Ogami Systems</div>
+    <h1>We build the system your business <em>runs on</em>.</h1>
+    <p class="lede">Custom software for owner-operated businesses — the kind where you are the roaster, the shipper, and the inbox. Orders in, busywork out, your hours back.</p>
+    <div class="row">
+      <a class="btn" href="mailto:ogami.systems@gmail.com?subject=Tell%20me%20more">Talk to us</a>
+      <span class="quiet">One conversation. No pitch deck.</span>
+    </div>
+  </div>
+</main>
+<footer>
+  <span>© 2026 Ogami Systems</span>
+  <span>Built for the people who build things.</span>
+</footer>
+</body>
+</html>
