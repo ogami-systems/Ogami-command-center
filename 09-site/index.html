@@ -3,73 +3,228 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ogami Systems</title>
-<meta name="description" content="Custom software for owner-operated businesses. Orders in, busywork out.">
+<title>Ogami — Find chaos. Provide order.</title>
+<meta name="description" content="Ogami finds where your business leaks money, time, and quality — and seals those leaks so your business runs itself.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#241811;
-  --paper:#EFE6D8;
-  --tan:#C9B393;
-  --amber:#D98E32;
-  --line:rgba(239,230,216,.16);
+  --sage:#9C9D8E;        /* the logo's ground */
+  --cream:#F5F4EB;       /* page paper */
+  --ink:#39452B;         /* deep moss — headings, primary text */
+  --body:#4C543C;        /* running text */
+  --muted:#7C8168;       /* captions, eyebrows */
+  --panel:#E8EADC;       /* soft sage panels */
+  --rust:#9C5B33;        /* leaks only — never decoration */
+  --line:rgba(57,69,43,.16);
+  --disp:'Schibsted Grotesk', -apple-system, sans-serif;
+  --text:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100svh;
-  display:flex;flex-direction:column;
-  background:var(--ink);
-  background-image:radial-gradient(rgba(239,230,216,.04) 1px, transparent 1.4px);
-  background-size:28px 28px;
-  color:var(--paper);
-  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-  line-height:1.55;
-  -webkit-font-smoothing:antialiased;
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--body);font-family:var(--text);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--ink)}
+:focus-visible{outline:3px solid var(--rust);outline-offset:3px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+
+.eyebrow{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:14px}
+h2{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:clamp(1.6rem,3.6vw,2.3rem);letter-spacing:-.01em;line-height:1.18;text-wrap:balance;margin-bottom:16px}
+h3{font-family:var(--disp);font-weight:600;color:var(--ink);font-size:1.08rem;margin-bottom:6px}
+p{max-width:62ch}
+section{padding:84px 24px}
+.inner{max-width:960px;margin:0 auto}
+.narrow{max-width:720px;margin:0 auto}
+
+/* ---- hero: the logo's own sage world ---- */
+header.hero{background:var(--sage);text-align:center;padding:72px 24px 76px}
+header.hero img{width:min(280px,60vw);height:auto;margin:0 auto 8px}
+.tagline{font-size:.82rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ink);font-weight:600}
+.hero-sub{max-width:34em;margin:26px auto 0;color:#3E4733;font-size:1.05rem}
+.hero-cta{margin-top:34px}
+.btn{display:inline-block;text-decoration:none;font-family:var(--disp);font-weight:600;font-size:.95rem;
+  background:var(--ink);color:var(--cream);padding:14px 30px;border-radius:3px;transition:transform .12s ease,opacity .12s ease}
+.btn:hover{transform:translateY(-1px);opacity:.92}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+
+/* ---- quote ---- */
+.quote{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--cream)}
+.quote blockquote{font-family:var(--disp);font-weight:500;color:var(--ink);font-size:clamp(1.25rem,2.8vw,1.7rem);line-height:1.45;max-width:24em;margin:0 auto;text-align:center;text-wrap:balance}
+
+/* ---- three leaks ---- */
+.leak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;margin-top:36px}
+@media(max-width:760px){.leak-grid{grid-template-columns:1fr}}
+.leak h3{display:flex;align-items:center;gap:10px}
+.leak h3::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--rust);flex:0 0 auto}
+.leak p{font-size:.95rem}
+
+/* ---- the machine ---- */
+.machine-wrap{background:var(--panel);border-radius:6px;padding:44px 30px 30px;margin-top:36px}
+.machine{display:flex;align-items:stretch;justify-content:center;gap:0;flex-wrap:nowrap}
+.stage{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:14px 10px;text-align:center;flex:1;min-width:0}
+.stage b{display:block;font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;color:var(--ink)}
+.stage span{font-size:.72rem;color:var(--muted)}
+.handoff{display:flex;align-items:center;padding:0 8px;flex:0 0 auto}
+.handoff i{width:8px;height:8px;border-radius:50%;background:var(--rust)}
+.machine-legend{margin-top:22px;font-size:.8rem;color:var(--muted);text-align:center}
+.machine-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rust);margin-right:7px}
+.supports{display:flex;justify-content:center;gap:10px 26px;flex-wrap:wrap;margin-top:16px;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:760px){
+  .machine{flex-direction:column}
+  .handoff{justify-content:center;padding:8px 0}
 }
-main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
-.card{max-width:560px}
-.mark{
-  font-size:.78rem;letter-spacing:.34em;text-transform:uppercase;
-  color:var(--amber);font-weight:700;margin-bottom:26px;
-}
-h1{
-  font-size:clamp(1.9rem,5.5vw,2.9rem);
-  font-weight:800;letter-spacing:-.015em;line-height:1.16;
-  text-wrap:balance;margin-bottom:18px;
-}
-h1 em{font-style:normal;color:var(--amber)}
-.lede{color:var(--tan);font-size:1.02rem;max-width:46ch;margin-bottom:34px}
-.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.btn{
-  display:inline-block;text-decoration:none;font-weight:700;font-size:.92rem;
-  background:var(--amber);color:#241811;padding:13px 26px;border-radius:8px;
-  transition:transform .1s ease;
-}
-.btn:hover{transform:translateY(-1px)}
-.btn:focus-visible{outline:3px solid var(--paper);outline-offset:3px}
-.quiet{color:var(--tan);font-size:.85rem}
-footer{
-  border-top:1px solid var(--line);
-  padding:18px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  font-size:.75rem;color:rgba(201,179,147,.7);
-}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* ---- method: diagnose / seal / maintain ---- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;margin-top:36px}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+.step .k{font-family:var(--disp);font-weight:700;color:var(--sage);font-size:2.2rem;line-height:1;margin-bottom:10px}
+.step p{font-size:.95rem}
+
+/* ---- engagement path ---- */
+.path{margin-top:36px;border-top:1px solid var(--line)}
+.path-row{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:26px 0;border-bottom:1px solid var(--line)}
+.path-row .n{font-family:var(--disp);font-weight:700;font-size:1.9rem;color:var(--sage);line-height:1}
+.path-row p{font-size:.95rem;margin-top:4px}
+
+/* ---- principles ---- */
+.principles{background:var(--panel)}
+.prin-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px 44px;margin-top:36px}
+@media(max-width:760px){.prin-grid{grid-template-columns:1fr}}
+.prin b{display:block;font-family:var(--disp);font-weight:600;color:var(--ink);margin-bottom:4px}
+.prin p{font-size:.93rem}
+
+/* ---- feels like ---- */
+.feels p{font-size:1.05rem;color:var(--ink)}
+.feels .rest{font-size:.98rem;color:var(--body);margin-top:14px}
+
+/* ---- audit CTA ---- */
+.audit{background:var(--ink);color:#E9EADF;text-align:center}
+.audit .eyebrow{color:#B9BCA5}
+.audit h2{color:#F5F4EB}
+.audit p{margin:0 auto;color:#CBCEB8;max-width:44em}
+.audit .btn{background:var(--cream);color:var(--ink);margin-top:32px}
+.audit .keep{font-size:.85rem;color:#A9AD93;margin-top:16px}
+
+/* ---- footer ---- */
+footer{padding:34px 24px;text-align:center;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+footer a{color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:none;font-size:.8rem}
+footer .sep{margin:0 12px}
 </style>
 </head>
 <body>
-<main>
-  <div class="card">
-    <div class="mark">Ogami Systems</div>
-    <h1>We build the system your business <em>runs on</em>.</h1>
-    <p class="lede">Custom software for owner-operated businesses — the kind where you are the roaster, the shipper, and the inbox. Orders in, busywork out, your hours back.</p>
-    <div class="row">
-      <a class="btn" href="mailto:ogami.systems@gmail.com?subject=Tell%20me%20more">Talk to us</a>
-      <span class="quiet">One conversation. No pitch deck.</span>
+
+<header class="hero">
+  <img src="assets/ogami-logo.png" alt="Ogami" width="480" height="560">
+  <div class="tagline">Find chaos. Provide order.</div>
+  <p class="hero-sub">Ogami finds where your business leaks money, time, and quality — and seals those leaks so your business runs itself.</p>
+  <div class="hero-cta"><a class="btn" href="#audit">Start with the audit</a></div>
+</header>
+
+<section class="quote">
+  <div class="inner">
+    <blockquote>Every business is the same machine wearing a different uniform.</blockquote>
+  </div>
+</section>
+
+<section>
+  <div class="inner">
+    <div class="eyebrow">Why businesses leak</div>
+    <h2>You built it on vision and sheer will. It runs on sticky notes and memory.</h2>
+    <p>The traits that make someone good at starting a business are almost the opposite of the traits it takes to run one profitably. Most owners never get an operations person — so the business runs on a patchwork of memory, text threads, and heroic effort. It works well enough to survive. But it leaks everywhere: quietly, daily, in ways the owner has learned to stop seeing.</p>
+    <p style="margin-top:12px">That is our job. We see what you've stopped seeing, measure what it costs, and fix it.</p>
+    <div class="leak-grid">
+      <div class="leak">
+        <h3>Money</h3>
+        <p>Missed calls that were jobs. Quotes that never got a follow-up. Work never invoiced, invoices never chased, customers who drifted away because nobody stayed in touch.</p>
+      </div>
+      <div class="leak">
+        <h3>Time</h3>
+        <p>The same information typed into three places. Questions answered forty times a week. Paperwork nights. The owner doing $20-an-hour tasks between $500-an-hour decisions.</p>
+      </div>
+      <div class="leak">
+        <h3>Quality</h3>
+        <p>Steps that live in one person's head. Work done differently every time. Mistakes discovered by the customer instead of the process.</p>
+      </div>
     </div>
   </div>
-</main>
+</section>
+
+<section style="padding-top:0">
+  <div class="inner">
+    <div class="eyebrow">The anatomy of a business</div>
+    <h2>Five stages. Every arrow is a handoff. Every handoff can leak.</h2>
+    <p>A bakery, a plumbing company, a law office — the same drawing with different labels. Inside a stage, work is usually fine; people know their jobs. It's <em>between</em> the steps that value disappears. We are not learning your industry from scratch — we are locating your version of the leaks every business has.</p>
+    <div class="machine-wrap">
+      <div class="machine" role="img" aria-label="Five stages: attract, sell, deliver, collect, retain and grow — with a leak point at each handoff">
+        <div class="stage"><b>ATTRACT</b><span>get found</span></div>
+        <div class="handoff" aria-hidden="true"><i></i></div>
+        <div class="stage"><b>SELL</b><span>turn interest into a yes</span></div>
+        <div class="handoff" aria-hidden="true"><i></i></div>
+        <div class="stage"><b>DELIVER</b><span>do the work</span></div>
+        <div class="handoff" aria-hidden="true"><i></i></div>
+        <div class="stage"><b>COLLECT</b><span>get paid</span></div>
+        <div class="handoff" aria-hidden="true"><i></i></div>
+        <div class="stage"><b>RETAIN &amp; GROW</b><span>keep &amp; multiply</span></div>
+      </div>
+      <div class="machine-legend"><i></i>= a handoff, where businesses leak</div>
+      <div class="supports"><span>People</span><span>Money</span><span>Data &amp; Tools</span><span>The Owner</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="inner">
+    <div class="eyebrow">What we do about it</div>
+    <h2>Diagnose. Seal. Maintain.</h2>
+    <div class="steps">
+      <div class="step"><div class="k">01</div><h3>Diagnose</h3>
+        <p>The Ogami Operating Audit — a structured, expert walk through your entire business, end to end. Every area scored, every leak measured in dollars and hours. You leave with a written report you can act on, with or without us.</p></div>
+      <div class="step"><div class="k">02</div><h3>Seal</h3>
+        <p>Each leak gets sealed with the right instrument: automated systems that do the task themselves, a better process for doing it — often both. The biggest, fastest-payoff leak goes first, so the work proves itself before it asks for anything more.</p></div>
+      <div class="step"><div class="k">03</div><h3>Maintain</h3>
+        <p>Sealed systems get watched. Every month you get a simple report: what the systems caught, what they recovered, what they saved, and where the next leak is. The results make the case — we never have to.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="principles">
+  <div class="inner">
+    <div class="eyebrow">Our principles</div>
+    <h2>How we work, in five rules.</h2>
+    <div class="prin-grid">
+      <div class="prin"><b>Diagnosis before prescription.</b><p>We never recommend a fix before the leak is found, measured, and shown to you. Tools are prescriptions, not products.</p></div>
+      <div class="prin"><b>Show it, never pitch it.</b><p>Every month, the report makes the case with numbers. If the numbers ever stop making the case, you should stop paying us. No long-term contracts — the results are the contract.</p></div>
+      <div class="prin"><b>One leak at a time.</b><p>Businesses don't need a transformation project. They need the biggest hole sealed, then the next one. Momentum beats overhaul.</p></div>
+      <div class="prin"><b>Simple over impressive.</b><p>The best fix is the simplest thing that permanently closes the leak. Sometimes that's software. Sometimes it's a checklist and a rule.</p></div>
+      <div class="prin"><b>The owner's life is the metric.</b><p>Revenue recovered and hours returned only matter if you get your evenings, your focus, and your business back.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="feels">
+  <div class="narrow">
+    <div class="eyebrow">What it feels like</div>
+    <h2>Things that used to require chasing simply happen.</h2>
+    <p>Calls get answered even when no one can answer. Leads get followed up every time, without anyone remembering to. Quotes go out fast and chase themselves. Invoices leave the moment work is done, and the money gets collected. Reviews accumulate. Past customers come back.</p>
+    <p class="rest">You don't need to learn the technology, manage the technology, or even think about the technology. The numbers that matter show up on one scorecard, without anyone assembling them.</p>
+  </div>
+</section>
+
+<section id="audit" class="audit">
+  <div class="inner">
+    <div class="eyebrow">The engagement path</div>
+    <h2>It starts with the Operating Audit.</h2>
+    <p>One structured conversation that walks your whole machine — every stage, every handoff — and produces a scored, dollar-quantified leak report. Then one sealed leak at a time, for as long as the numbers earn it.</p>
+    <a class="btn" href="mailto:ogami.systems@gmail.com?subject=Operating%20Audit">Book the audit</a>
+    <div class="keep">You keep the report either way — it's useful with us or without us.</div>
+  </div>
+</section>
+
 <footer>
-  <span>© 2026 Ogami Systems</span>
-  <span>Built for the people who build things.</span>
+  <div>Ogami &nbsp;—&nbsp; Find chaos. Provide order.</div>
+  <div style="margin-top:10px"><a href="mailto:ogami.systems@gmail.com">ogami.systems@gmail.com</a><span class="sep">·</span>© 2026 Ogami Systems</div>
 </footer>
+
 </body>
 </html>
