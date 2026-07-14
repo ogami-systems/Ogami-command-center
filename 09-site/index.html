@@ -7,118 +7,166 @@
 <meta name="description" content="Ogami finds where your business leaks money, time, and quality — then designs and builds the systems that seal those leaks and carry the growth you actually want.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   Ogami — Apple × Muji pass.
+   One family (SF on Apple hardware, Inter elsewhere), carried by
+   weight, optical tracking, and space. One serif-italic accent.
+   Tonal surfaces, no borders where a shade will do. Quiet motion.
+   ============================================================ */
 :root{
   --sage:#9C9D8E;
   --cream:#F5F4EB;
+  --card:#ECEEE0;         /* tonal card on cream */
+  --panel:#E9EBDD;        /* alternating section ground */
+  --card-on-panel:#F5F4EB;
   --ink:#39452B;
-  --body:#4C543C;
-  --muted:#7C8168;
-  --panel:#E8EADC;
-  --rust:#9C5B33;      /* leaks only */
-  --line:rgba(57,69,43,.15);
-  --disp:'Schibsted Grotesk', -apple-system, sans-serif;
-  --text:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --body:#454F37;
+  --muted:#7E836B;
+  --rust:#9C5B33;         /* leaks only */
+  --hairline:rgba(57,69,43,.10);
+  --sans:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --serif:'Newsreader', 'Iowan Old Style', Georgia, serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--cream);color:var(--body);font-family:var(--text);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--cream);color:var(--body);
+  font-family:var(--sans);font-size:17px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  font-feature-settings:'kern' 1;
+}
 img{max-width:100%;display:block}
 a{color:var(--ink)}
-:focus-visible{outline:3px solid var(--rust);outline-offset:3px;border-radius:2px}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+:focus-visible{outline:3px solid var(--rust);outline-offset:3px;border-radius:4px}
 
-.eyebrow{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:16px}
-h2{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:clamp(1.7rem,4.2vw,2.6rem);letter-spacing:-.01em;line-height:1.15;text-wrap:balance;margin-bottom:18px}
-p{max-width:58ch}
-.big{font-size:1.12rem;color:var(--ink)}
-section{padding:96px 24px}
+/* ---- type scale ---- */
+.eyebrow{font-size:.67rem;letter-spacing:.36em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:18px}
+h2{
+  font-weight:650;color:var(--ink);
+  font-size:clamp(1.85rem,4.6vw,2.8rem);
+  letter-spacing:-.025em;line-height:1.1;text-wrap:balance;margin-bottom:20px;
+}
+p{max-width:34em}
+.lead{font-size:1.06rem;line-height:1.7}
+.serif{
+  font-family:var(--serif);font-style:italic;font-weight:450;
+  color:var(--ink);font-size:1.35rem;line-height:1.5;letter-spacing:0;
+}
+section{padding:118px 24px}
+@media(max-width:700px){section{padding:84px 22px}}
 .inner{max-width:880px;margin:0 auto}
 .center{text-align:center}
 .center p{margin-left:auto;margin-right:auto}
 
-/* ---- slim nav: three words and a button ---- */
-nav.top{
-  position:sticky;top:0;z-index:50;background:rgba(245,244,235,.92);backdrop-filter:blur(8px);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:20px;padding:12px 22px;
+/* ---- quiet motion ---- */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .8s cubic-bezier(.2,.6,.2,1),transform .8s cubic-bezier(.2,.6,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-rise{animation:rise .9s cubic-bezier(.2,.6,.2,1) both}
+.d1{animation-delay:.12s}.d2{animation-delay:.24s}.d3{animation-delay:.38s}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+  .reveal{opacity:1;transform:none}
 }
-nav.top .wordmark{font-family:var(--disp);font-weight:700;letter-spacing:.32em;font-size:.95rem;color:var(--ink);text-decoration:none;margin-right:auto}
-nav.top a.lnk{font-size:.85rem;font-weight:500;color:var(--body);text-decoration:none;white-space:nowrap}
-nav.top a.lnk:hover{color:var(--ink)}
-nav.top .btn{padding:9px 18px;font-size:.83rem}
-@media(max-width:560px){nav.top a.lnk{display:none}}
 
-.btn{display:inline-block;text-decoration:none;font-family:var(--disp);font-weight:600;font-size:.95rem;
-  background:var(--ink);color:var(--cream);padding:15px 32px;border-radius:3px;transition:transform .12s ease,opacity .12s ease}
-.btn:hover{transform:translateY(-1px);opacity:.92}
+/* ---- nav: three words and a pill ---- */
+nav.top{
+  position:sticky;top:0;z-index:50;
+  background:rgba(245,244,235,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hairline);
+  display:flex;align-items:center;gap:26px;padding:14px 26px;
+}
+nav.top .wordmark{font-weight:700;letter-spacing:.34em;font-size:.92rem;color:var(--ink);text-decoration:none;margin-right:auto}
+nav.top a.lnk{font-size:.88rem;font-weight:500;color:var(--body);text-decoration:none;white-space:nowrap;transition:color .2s ease}
+nav.top a.lnk:hover{color:var(--ink)}
+nav.top .btn{padding:9px 20px;font-size:.84rem}
+@media(max-width:600px){nav.top a.lnk{display:none}}
+
+.btn{
+  display:inline-block;text-decoration:none;font-weight:600;font-size:.95rem;letter-spacing:-.005em;
+  background:var(--ink);color:var(--cream);padding:15px 32px;border-radius:999px;
+  transition:transform .18s cubic-bezier(.2,.6,.2,1),box-shadow .18s ease;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(57,69,43,.18)}
+.btn:active{transform:translateY(0)}
 
 /* ---- hero ---- */
-header.hero{background:var(--sage);text-align:center;padding:80px 24px 88px}
-header.hero img{width:min(250px,55vw);height:auto;margin:0 auto 4px}
-.tagline{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:clamp(1rem,4.1vw,2.4rem);line-height:1.25;letter-spacing:.01em;white-space:nowrap;margin:18px auto 0}
-.hero-sub{max-width:31em;margin:22px auto 0;color:#3E4733;font-size:1.08rem}
-.hero-cta{margin-top:36px}
+header.hero{background:var(--sage);text-align:center;padding:96px 24px 104px}
+header.hero img{width:min(235px,52vw);height:auto;margin:0 auto}
+.tagline{
+  font-weight:650;color:var(--ink);
+  font-size:clamp(1rem,4vw,2.5rem);
+  letter-spacing:-.022em;line-height:1.2;white-space:nowrap;margin:26px auto 0;
+}
+.hero-sub{max-width:30em;margin:24px auto 0;color:#3D4630;font-size:1.09rem;line-height:1.7}
+.hero-cta{margin-top:40px}
 
 /* ---- leaks ---- */
-.leak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;text-align:left}
+.leak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px;text-align:left}
 @media(max-width:760px){.leak-grid{grid-template-columns:1fr}}
-.leak{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:26px 24px}
-.leak h3{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:1.15rem;display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.leak h3::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--rust);flex:0 0 auto}
-.leak p{font-size:.93rem}
+.leak{background:var(--card);border-radius:18px;padding:30px 28px}
+.leak h3{font-weight:650;color:var(--ink);font-size:1.14rem;letter-spacing:-.012em;display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.leak h3::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--rust);flex:0 0 auto}
+.leak p{font-size:.94rem;line-height:1.65}
+.takeaway{margin-top:46px}
 
 /* ---- machine ---- */
-.machine{display:flex;align-items:stretch;justify-content:center;margin-top:44px}
-.stage{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:16px 10px;text-align:center;flex:1;min-width:0}
-.stage b{display:block;font-family:var(--disp);font-weight:700;font-size:.8rem;letter-spacing:.05em;color:var(--ink)}
+.machine{display:flex;align-items:stretch;justify-content:center;margin-top:52px}
+.stage{background:var(--card-on-panel);border-radius:14px;padding:18px 12px;text-align:center;flex:1;min-width:0;box-shadow:0 1px 2px rgba(57,69,43,.05)}
+.stage b{display:block;font-weight:650;font-size:.76rem;letter-spacing:.1em;color:var(--ink)}
 .stage span{font-size:.72rem;color:var(--muted)}
-.handoff{display:flex;align-items:center;padding:0 9px;flex:0 0 auto}
-.handoff i{width:8px;height:8px;border-radius:50%;background:var(--rust)}
-.machine-legend{margin-top:20px;font-size:.82rem;color:var(--muted);text-align:center}
-.machine-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rust);margin-right:7px}
-@media(max-width:760px){.machine{flex-direction:column}.handoff{justify-content:center;padding:8px 0}}
+.handoff{display:flex;align-items:center;padding:0 10px;flex:0 0 auto}
+.handoff i{width:7px;height:7px;border-radius:50%;background:var(--rust)}
+.machine-legend{margin-top:22px;font-size:.82rem;color:var(--muted);text-align:center}
+.machine-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rust);margin-right:8px}
+@media(max-width:760px){.machine{flex-direction:column;gap:0}.handoff{justify-content:center;padding:9px 0}}
 
 /* ---- what we build ---- */
-.build-list{margin-top:40px;border-top:1px solid var(--line)}
-.build-row{display:grid;grid-template-columns:220px 1fr;gap:18px;padding:20px 0;border-bottom:1px solid var(--line)}
-.build-row b{font-family:var(--disp);font-weight:600;color:var(--ink);font-size:1rem}
-.build-row p{font-size:.93rem}
-@media(max-width:620px){.build-row{grid-template-columns:1fr;gap:4px}}
+.build-list{margin-top:48px;text-align:left}
+.build-row{display:grid;grid-template-columns:215px 1fr;gap:20px;padding:24px 4px;border-top:1px solid var(--hairline)}
+.build-row:last-child{border-bottom:1px solid var(--hairline)}
+.build-row b{font-weight:650;color:var(--ink);font-size:1.02rem;letter-spacing:-.01em}
+.build-row p{font-size:.94rem;line-height:1.65}
+@media(max-width:620px){.build-row{grid-template-columns:1fr;gap:5px}}
 
-/* ---- method: 4 steps ---- */
-.method{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:44px;text-align:left}
+/* ---- method ---- */
+.method{display:grid;grid-template-columns:repeat(4,1fr);gap:36px 28px;margin-top:56px;text-align:left}
 @media(max-width:860px){.method{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.method{grid-template-columns:1fr}}
-.mstep .k{font-family:var(--disp);font-weight:700;color:var(--sage);font-size:2rem;line-height:1;margin-bottom:8px}
-.mstep h3{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:1.1rem;margin-bottom:6px}
-.mstep p{font-size:.92rem}
+.mstep .k{font-weight:300;color:var(--sage);font-size:2.6rem;line-height:1;letter-spacing:-.02em;margin-bottom:12px;font-variant-numeric:tabular-nums}
+.mstep h3{font-weight:650;color:var(--ink);font-size:1.1rem;letter-spacing:-.012em;margin-bottom:7px}
+.mstep p{font-size:.92rem;line-height:1.62}
 
 /* ---- promises ---- */
-.prom-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 44px;margin-top:40px;text-align:left}
+.prom-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 52px;margin-top:50px;text-align:left}
 @media(max-width:720px){.prom-grid{grid-template-columns:1fr}}
-.prom b{display:block;font-family:var(--disp);font-weight:600;color:var(--ink);margin-bottom:3px}
-.prom p{font-size:.92rem}
+.prom b{display:block;font-weight:650;color:var(--ink);letter-spacing:-.01em;margin-bottom:4px}
+.prom p{font-size:.93rem;line-height:1.62}
 
 /* ---- path ---- */
-.path{margin-top:40px;border-top:1px solid var(--line);text-align:left}
-.path-row{display:grid;grid-template-columns:58px 1fr;gap:18px;padding:24px 0;border-bottom:1px solid var(--line)}
-.path-row .n{font-family:var(--disp);font-weight:700;font-size:1.7rem;color:var(--sage);line-height:1.1}
-.path-row h3{font-family:var(--disp);font-weight:700;color:var(--ink);font-size:1.05rem}
-.path-row p{font-size:.93rem;margin-top:3px}
+.path{margin-top:48px;text-align:left}
+.path-row{display:grid;grid-template-columns:64px 1fr;gap:22px;padding:28px 4px;border-top:1px solid var(--hairline)}
+.path-row:last-child{border-bottom:1px solid var(--hairline)}
+.path-row .n{font-weight:300;font-size:2rem;color:var(--sage);line-height:1.1;font-variant-numeric:tabular-nums}
+.path-row h3{font-weight:650;color:var(--ink);font-size:1.05rem;letter-spacing:-.01em}
+.path-row p{font-size:.93rem;margin-top:4px;line-height:1.62}
 
 /* ---- audit CTA ---- */
-.audit{background:var(--ink);color:#E9EADF;text-align:center;padding:100px 24px}
-.audit .eyebrow{color:#B9BCA5}
+.audit{background:var(--ink);color:#E9EADF;text-align:center;padding:124px 24px}
+.audit .eyebrow{color:#AEB29A}
 .audit h2{color:#F5F4EB}
-.audit p{margin:0 auto;color:#CBCEB8;max-width:38em}
-.audit .btn{background:var(--cream);color:var(--ink);margin-top:34px}
-.audit .keep{font-size:.88rem;color:#A9AD93;margin-top:18px}
+.audit p{margin:0 auto;color:#C6C9B2}
+.audit .btn{background:var(--cream);color:var(--ink);margin-top:38px}
+.audit .keep{font-family:var(--serif);font-style:italic;font-size:1.02rem;color:#A9AD93;margin-top:22px}
 
-footer{padding:36px 24px;text-align:center;font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
-footer a{color:var(--muted);text-decoration:none;letter-spacing:.05em;text-transform:none;font-size:.82rem}
-footer .sep{margin:0 12px}
+footer{padding:44px 24px 52px;text-align:center}
+footer .fmark{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-weight:600}
+footer .fline{margin-top:10px;font-size:.84rem;color:var(--muted)}
+footer a{color:var(--muted);text-decoration:none}
+footer .sep{margin:0 12px;opacity:.6}
 </style>
 </head>
 <body>
@@ -132,17 +180,17 @@ footer .sep{margin:0 12px}
 </nav>
 
 <header class="hero" id="top">
-  <img src="assets/ogami-logo.png" alt="Ogami" width="480" height="560">
-  <h1 class="tagline">Find chaos. Design order. Build systems.</h1>
-  <p class="hero-sub">Your business leaks money and time every day, in places you've learned to stop seeing. We find the leaks, then build the systems that stop them — for good.</p>
-  <div class="hero-cta"><a class="btn" href="#audit">Start with the audit</a></div>
+  <img class="hero-rise" src="assets/ogami-logo.png" alt="Ogami" width="480" height="560">
+  <h1 class="tagline hero-rise d1">Find chaos. Design order. Build systems.</h1>
+  <p class="hero-sub hero-rise d2">Your business leaks money and time every day, in places you've learned to stop seeing. We find the leaks, then build the systems that stop them — for good.</p>
+  <div class="hero-cta hero-rise d3"><a class="btn" href="#audit">Start with the audit</a></div>
 </header>
 
 <section id="leaks" class="center">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">The problem</div>
     <h2>Every business leaks in three ways.</h2>
-    <p>You built this on vision and sheer will. But most businesses run on sticky notes, memory, and heroic effort — and that leaks. Quietly. Daily.</p>
+    <p class="lead">You built this on vision and sheer will. But most businesses run on sticky notes, memory, and heroic effort — and that leaks. Quietly. Daily.</p>
     <div class="leak-grid">
       <div class="leak"><h3>Money</h3>
         <p>The call that rang while everyone was busy. The quote nobody followed up. The work that was never invoiced. The customer who drifted away.</p></div>
@@ -151,15 +199,15 @@ footer .sep{margin:0 12px}
       <div class="leak"><h3>Quality</h3>
         <p>Steps that live in one person's head. Work done differently every time. Mistakes found by the customer instead of the process.</p></div>
     </div>
-    <p class="big" style="margin-top:34px">We build simple, integrated systems — so everything flows into and out of one place.</p>
+    <p class="serif takeaway">We build simple, integrated systems — so everything flows into and out of one place.</p>
   </div>
 </section>
 
 <section class="center" style="background:var(--panel)">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">The map</div>
     <h2>Every business is the same machine.</h2>
-    <p>A bakery, a plumbing company, a law office — same machine, different uniform. Work flows through five stages, and the leaks live at the handoffs <em>between</em> them. Many of the steps themselves are repetitive and automatable — and when we automate the repetitive and monotonous, humans get to do what they do best: create and oversee.</p>
+    <p class="lead">A bakery, a plumbing company, a law office — same machine, different uniform. Work flows through five stages, and the leaks live at the handoffs <em>between</em> them. Many of the steps themselves are repetitive and automatable — and when we automate the repetitive and monotonous, humans get to do what they do best: create and oversee.</p>
     <div class="machine" role="img" aria-label="Five stages — attract, sell, deliver, collect, retain and grow — with a leak point at every handoff between them">
       <div class="stage"><b>ATTRACT</b><span>get found</span></div>
       <div class="handoff" aria-hidden="true"><i></i></div>
@@ -172,15 +220,15 @@ footer .sep{margin:0 12px}
       <div class="stage"><b>RETAIN &amp; GROW</b><span>keep &amp; multiply</span></div>
     </div>
     <div class="machine-legend"><i></i>= a handoff — where businesses leak</div>
-    <p style="margin-top:26px;font-size:.95rem">This is also why growth stalls: every next level of revenue runs on systems the current level doesn't have. The map tells us what to build, in what order — so the machine is ready for the business it's about to become.</p>
+    <p style="margin-top:30px;font-size:.95rem">This is also why growth stalls: every next level of revenue runs on systems the current level doesn't have. The map tells us what to build, in what order — so the machine is ready for the business it's about to become.</p>
   </div>
 </section>
 
 <section class="center">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">What we build</div>
     <h2>Whatever the leak actually calls for.</h2>
-    <p>We're not a one-tool shop. We diagnose the need, design a solution, and build a custom system exactly for your need. Simple, reliable, effective.</p>
+    <p class="lead">We're not a one-tool shop. We diagnose the need, design a solution, and build a custom system exactly for your need. Simple, reliable, effective.</p>
     <div class="build-list">
       <div class="build-row"><b>Automations</b><p>Tasks that used to need chasing simply happen — reminders, follow-ups, records, on time, every time.</p></div>
       <div class="build-row"><b>Integrations</b><p>The tools you already pay for finally talk to each other, so nobody retypes anything.</p></div>
@@ -192,7 +240,7 @@ footer .sep{margin:0 12px}
 </section>
 
 <section id="method" class="center" style="background:var(--panel)">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">How it works</div>
     <h2>Diagnose. Design. Build. Run.</h2>
     <div class="method">
@@ -209,7 +257,7 @@ footer .sep{margin:0 12px}
 </section>
 
 <section class="center">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">Our promises</div>
     <h2>Six rules we don't break.</h2>
     <div class="prom-grid">
@@ -224,7 +272,7 @@ footer .sep{margin:0 12px}
 </section>
 
 <section id="path" class="center" style="background:var(--panel)">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">The path</div>
     <h2>One step at a time, for as long as the numbers earn it.</h2>
     <div class="path">
@@ -243,19 +291,33 @@ footer .sep{margin:0 12px}
 </section>
 
 <section id="audit" class="audit">
-  <div class="inner">
+  <div class="inner reveal">
     <div class="eyebrow">Start here</div>
     <h2>It starts with one conversation.</h2>
-    <p>The Ogami Operating Audit: one sitting, your whole business walked end to end, every leak scored and priced, and a map of what's worth building first.</p>
+    <p class="lead">The Ogami Operating Audit: one sitting, your whole business walked end to end, every leak scored and priced, and a map of what's worth building first.</p>
     <a class="btn" href="mailto:ogami.systems@gmail.com?subject=Operating%20Audit">Book the audit</a>
     <div class="keep">You keep the report either way — useful with us or without us.</div>
   </div>
 </section>
 
 <footer>
-  <div>Ogami &nbsp;—&nbsp; Find chaos. Design order. Build systems.</div>
-  <div style="margin-top:10px"><a href="mailto:ogami.systems@gmail.com">ogami.systems@gmail.com</a><span class="sep">·</span>© 2026 Ogami Systems</div>
+  <div class="fmark">Ogami — Find chaos. Design order. Build systems.</div>
+  <div class="fline"><a href="mailto:ogami.systems@gmail.com">ogami.systems@gmail.com</a><span class="sep">·</span>© 2026 Ogami Systems</div>
 </footer>
+
+<script>
+// Quiet fade-up as sections enter. No-JS and reduced-motion users see everything immediately.
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
 
 </body>
 </html>
